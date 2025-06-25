@@ -10,13 +10,16 @@ public class OrderItem : EntityBase
 {
     public int Quantity { get; set; }
     public decimal UnitPrice { get; set; }
-    public decimal SubTotal { get; set; }
+    public decimal SubTotal { get; private set; }
     public Product Product { get; set; }
-    public OrderItem(Product product, int quantity)
+    public OrderItem()
     {
-        Product = product ?? throw new ArgumentNullException();
+        
+    }
+    public OrderItem(int quantity,decimal unitPrice)
+    {
+        UnitPrice = unitPrice;
         Quantity = quantity;
-        UnitPrice = product.CurrentUnitPrice;
         SubTotal = CalculateSubTotal();
     }
 
