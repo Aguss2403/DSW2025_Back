@@ -18,6 +18,19 @@ public class ProductsManagementService
         _repository = repository;
     }
 
+    private static ProductModel.Response MapToResponse(Product product)
+    {
+        return new ProductModel.Response(
+            product.Id,
+            product.Sku,
+            product.InternalCode,
+            product.Name,
+            product.Description,
+            product.CurrentUnitPrice,
+            product.StockQuantity,
+            product.IsActive);
+    }
+
     public async Task<ProductModel.Response?> GetProductById(Guid id)
     {
         var product = await _repository.GetById<Product>(id);
@@ -35,15 +48,8 @@ public class ProductsManagementService
 
     public async Task<IEnumerable<ProductModel.Response>?> GetProducts()
     {
-        return (await _repository.GetFiltered<Product>(p => p.IsActive))?.Select(p => new ProductModel.Response(
-            p.Id,
-            p.Sku,
-            p.InternalCode,
-            p.Name,
-            p.Description,
-            p.CurrentUnitPrice,
-            p.StockQuantity,
-            p.IsActive));
+        var products = await _repository.GetFiltered<Product>(p => p.IsActive);
+        return products?.Select(MapToResponse);
     }
 
     public async Task<ProductModel.Response> AddProduct(ProductModel.Request request)
@@ -68,15 +74,7 @@ public class ProductsManagementService
 
         await _repository.Add(product);
 
-        return new ProductModel.Response(
-            product.Id,
-            product.Sku,
-            product.InternalCode,
-            product.Name,
-            product.Description,
-            product.CurrentUnitPrice,
-            product.StockQuantity,
-            product.IsActive);
+        return MapToResponse(product);
     }
 
     public async Task<ProductModel.Response?> Update(Guid id, ProductModel.Request request)
@@ -104,14 +102,24 @@ public class ProductsManagementService
 
         var updatedProduct = await _repository.Update(product);
 
-        return new ProductModel.Response(
-            updatedProduct.Id,
-            updatedProduct.Sku,
-            updatedProduct.InternalCode,
-            updatedProduct.Name,
-            updatedProduct.Description,
-            updatedProduct.CurrentUnitPrice,
-            updatedProduct.StockQuantity,
-            updatedProduct.IsActive);
+        return MapToResponse(product);
     }
+
+    public async Task<ProductModel.Response?> ToggleStatus(Guid id)
+    {
+        var product = await _repository.GetById<Product>(id);
+        if (product == null)
+        {
+            throw new EntityNotFoundException($"No se encontró un producto con el ID {id}");
+        }
+
+        product.IsActive = false;
+
+        var updatedProduct = await _repository.Update(product);
+
+        return MapToResponse(product);
+    }
+
+
+
 }

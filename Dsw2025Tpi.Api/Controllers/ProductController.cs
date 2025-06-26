@@ -86,6 +86,29 @@ public class ProductController : ControllerBase
         }
     }
 
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> ToggleProductStatus(Guid id)
+    {
+        try
+        {
+            var updatedProduct = await _service.ToggleStatus(id);
+            if (updatedProduct == null) throw new EntityNotFoundException($"No se encontró un producto con el ID {id}");
+            return Ok(updatedProduct);
+        }
+        catch (EntityNotFoundException ef)
+        {
+            return NotFound(ef.Message);
+        }
+        catch (ArgumentException ae)
+        {
+            return BadRequest(ae.Message);
+        }
+        catch (Exception)
+        {
+            return Problem("Se produjo un error al actualizar el estado del producto");
+        }
+    }
+
 
 
 

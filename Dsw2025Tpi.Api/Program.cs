@@ -1,12 +1,13 @@
 
-using Dsw2025Tpi.Data;
-using Dsw2025Tpi.Domain.Entities;
-using Dsw2025Tpi.Data.Helpers;
-using Microsoft.EntityFrameworkCore;
 using Dsw2025Tpi.Api.Utils;
 using Dsw2025Tpi.Application.Services;
-using Dsw2025Tpi.Domain.Interfaces;
+using Dsw2025Tpi.Data;
+using Dsw2025Tpi.Data.Helpers;
 using Dsw2025Tpi.Data.Repositories;
+using Dsw2025Tpi.Domain.Entities;
+using Dsw2025Tpi.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Dsw2025Tpi.Api;
 
@@ -24,8 +25,11 @@ public class Program
         builder.Services.AddSwaggerGen();
         builder.Services.AddHealthChecks();
 
-        
+
         builder.Services.AddDomainServices(builder.Configuration);
+
+
+
 
         builder.Services.AddTransient<ProductsManagementService>();
         builder.Services.AddTransient<OrdersManagementService>();
