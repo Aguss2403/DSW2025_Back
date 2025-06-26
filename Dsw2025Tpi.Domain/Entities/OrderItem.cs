@@ -1,32 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Dsw2025Tpi.Domain.Entities;
 
-namespace Dsw2025Tpi.Domain.Entities;
-
-public class OrderItem : EntityBase
+public class OrderItem : EntityBase // Quitado IOrderItemService
 {
     public int Quantity { get; set; }
     public decimal UnitPrice { get; set; }
-    public decimal SubTotal { get; private set; }
-    public required Product Product { get; set; }
-    public required Guid ProductId { get; set; }
-    public OrderItem()
+    public decimal SubTotal { get; set; }
+
+    public Guid ProductId { get; set; }
+    public Product Product { get; set; }
+
+    public Guid OrderId { get; set; }
+    public Order Order { get; set; }
+
+    public OrderItem() { }
+
+    public OrderItem(int quantity, Product product)
     {
-        
-    }
-    public OrderItem(int quantity, Guid productID)
-    {
-        UnitPrice = Product!.CurrentUnitPrice;
+        if (!product.HasSufficientStock(quantity))
+            throw new InvalidOperationException($"Stock insuficiente para el producto {product.Name}");
+
+        Product = product;
+        ProductId = product.Id;
         Quantity = quantity;
+        UnitPrice = product.CurrentUnitPrice;
         SubTotal = CalculateSubTotal();
-        ProductId = productID;
+        // El Order se setea desde la clase Order al agregar items
     }
 
-    private decimal CalculateSubTotal()
-    {
-        return UnitPrice * Quantity;
-    }
+    public decimal CalculateSubTotal() => UnitPrice * Quantity;
 }

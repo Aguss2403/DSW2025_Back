@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dsw2025Tpi.Data.Migrations
 {
     [DbContext(typeof(Dsw2025TpiContext))]
-    [Migration("20250626185518_ModelV2")]
-    partial class ModelV2
+    [Migration("20250626191023_ModelV2_fix")]
+    partial class ModelV2_fix
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace Dsw2025Tpi.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Dsw2025Tpi.Domain.Entities.Customer", b =>
+            modelBuilder.Entity("Customer", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -41,9 +41,6 @@ namespace Dsw2025Tpi.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<Guid>("OrderId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasMaxLength(15)
@@ -52,79 +49,6 @@ namespace Dsw2025Tpi.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Customers", (string)null);
-                });
-
-            modelBuilder.Entity("Dsw2025Tpi.Domain.Entities.Order", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("BillingAddress")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<DateTime>("OrderDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("OrderItemID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ShippingAddress")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CustomerId");
-
-                    b.ToTable("Orders", (string)null);
-                });
-
-            modelBuilder.Entity("Dsw2025Tpi.Domain.Entities.OrderItem", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("OrderId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("SubTotal")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("UnitPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("OrderItems", (string)null);
                 });
 
             modelBuilder.Entity("Dsw2025Tpi.Domain.Entities.Product", b =>
@@ -166,9 +90,79 @@ namespace Dsw2025Tpi.Data.Migrations
                     b.ToTable("Products", (string)null);
                 });
 
-            modelBuilder.Entity("Dsw2025Tpi.Domain.Entities.Order", b =>
+            modelBuilder.Entity("Order", b =>
                 {
-                    b.HasOne("Dsw2025Tpi.Domain.Entities.Customer", "Customer")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BillingAddress")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ShippingAddress")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("Orders", (string)null);
+                });
+
+            modelBuilder.Entity("OrderItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("SubTotal")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("OrderItems", (string)null);
+                });
+
+            modelBuilder.Entity("Order", b =>
+                {
+                    b.HasOne("Customer", "Customer")
                         .WithMany("Orders")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -177,11 +171,13 @@ namespace Dsw2025Tpi.Data.Migrations
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("Dsw2025Tpi.Domain.Entities.OrderItem", b =>
+            modelBuilder.Entity("OrderItem", b =>
                 {
-                    b.HasOne("Dsw2025Tpi.Domain.Entities.Order", null)
+                    b.HasOne("Order", "Order")
                         .WithMany("OrderItems")
-                        .HasForeignKey("OrderId");
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Dsw2025Tpi.Domain.Entities.Product", "Product")
                         .WithMany()
@@ -189,15 +185,17 @@ namespace Dsw2025Tpi.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Order");
+
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Dsw2025Tpi.Domain.Entities.Customer", b =>
+            modelBuilder.Entity("Customer", b =>
                 {
                     b.Navigation("Orders");
                 });
 
-            modelBuilder.Entity("Dsw2025Tpi.Domain.Entities.Order", b =>
+            modelBuilder.Entity("Order", b =>
                 {
                     b.Navigation("OrderItems");
                 });

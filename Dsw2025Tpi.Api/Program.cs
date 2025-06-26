@@ -4,7 +4,6 @@ using Dsw2025Tpi.Application.Services;
 using Dsw2025Tpi.Data;
 using Dsw2025Tpi.Data.Helpers;
 using Dsw2025Tpi.Data.Repositories;
-using Dsw2025Tpi.Domain.Entities;
 using Dsw2025Tpi.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -25,15 +24,10 @@ public class Program
         builder.Services.AddSwaggerGen();
         builder.Services.AddHealthChecks();
 
-
         builder.Services.AddDomainServices(builder.Configuration);
-
-
-
 
         builder.Services.AddTransient<ProductsManagementService>();
         builder.Services.AddTransient<OrdersManagementService>();
-
         builder.Services.AddScoped<IRepository, EfRepository>();
 
         var app = builder.Build();
@@ -50,7 +44,7 @@ public class Program
         app.UseAuthorization();
 
         app.MapControllers();
-        
+
         app.MapHealthChecks("/healthcheck");
 
         app.Run();
