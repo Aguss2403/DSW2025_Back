@@ -12,9 +12,13 @@ public class Customer : EntityBase
     public string Email { get; set; }
     public string PhoneNumber { get; set; }
     public List<Order> Orders { get; set; } = new List<Order>();
+    public Guid OrderId { get; set; }
 
-    public Customer()
+    public Customer(string name, string email, string phoneNumber, Guid orderId)
     {
-        
+        Name = name;
+        Email = email;
+        PhoneNumber = phoneNumber;
+        OrderId = orderId;
     }
 }

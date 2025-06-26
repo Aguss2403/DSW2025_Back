@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Dsw2025Tpi.Data.Helpers;
@@ -17,9 +18,22 @@ public static class DbContextExtensions
         var entities = JsonSerializer.Deserialize<List<T>>(json, new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true,
+            Converters = { new JsonStringEnumConverter() }
         });
         if(entities == null || entities.Count == 0) return;
-        context.Set<T>().AddRange(entities);
-        context.SaveChanges();
+        try
+        {
+            context.Set<T>().AddRange(entities);
+            context.SaveChanges();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al guardar los cambios: {ex.Message}");
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"Excepción interna: {ex.InnerException.Message}");
+            }
+            throw;
+        }
     }
 }

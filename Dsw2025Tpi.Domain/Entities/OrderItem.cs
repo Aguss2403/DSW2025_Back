@@ -11,16 +11,18 @@ public class OrderItem : EntityBase
     public int Quantity { get; set; }
     public decimal UnitPrice { get; set; }
     public decimal SubTotal { get; private set; }
-    public Product Product { get; set; }
+    public required Product Product { get; set; }
+    public required Guid ProductId { get; set; }
     public OrderItem()
     {
         
     }
-    public OrderItem(int quantity,decimal unitPrice)
+    public OrderItem(int quantity, Guid productID)
     {
-        UnitPrice = unitPrice;
+        UnitPrice = Product!.CurrentUnitPrice;
         Quantity = quantity;
         SubTotal = CalculateSubTotal();
+        ProductId = productID;
     }
 
     private decimal CalculateSubTotal()
