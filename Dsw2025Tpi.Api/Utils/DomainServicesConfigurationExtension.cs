@@ -15,9 +15,6 @@ public static class DomainServicesConfigurationExtension
             options.UseSeeding((c, t) =>
             {
                 ((Dsw2025TpiContext)c).SeedWork<Customer>("Sources\\customer.json");
-                //((Dsw2025TpiContext)c).SeedWork<Product>("Sources\\product.json");
-                //((Dsw2025TpiContext)c).SeedWork<Order>("Sources\\order.json");
-                //((Dsw2025TpiContext)c).SeedWork<OrderItem>("Sources\\orderitem.json");
             });
         });
         return services;

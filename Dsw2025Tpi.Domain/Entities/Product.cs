@@ -26,4 +26,24 @@ public class Product : EntityBase
         StockQuantity = stockQuantity;
         IsActive = true;
     }
+
+    public bool HasSufficientStock(int quantity)
+    {
+        return StockQuantity >= quantity;
+    }
+    public void DecreaseStock(int quantity)
+    {
+        if(quantity <= 0)
+        {
+            throw new ArgumentException("La cantidad de stock no puede ser cero.", nameof(quantity));
+        }
+        if (!HasSufficientStock(quantity))
+        {
+            throw new InvalidOperationException($"Stock insuficiente para el producto " +
+                $"{Name}, Disponible: {StockQuantity}, Solicitado: {quantity}");
+        }
+    }
+
+
 }
+

@@ -15,7 +15,7 @@ public class Order : EntityBase
     public decimal TotalAmount {get; private set; }
     public required Customer Customer { get; set; }
     public required Guid CustomerId { get; set; }
-    public required List<OrderItem> OrderItems { get; set; };
+    public required List<OrderItem> OrderItems { get; set; }
     //public required Guid OrderItemID { get; set; }
     public OrderStatus Status { get; set; } = OrderStatus.Pending;
 

@@ -10,10 +10,10 @@ using System.Threading.Tasks;
 
 namespace Dsw2025Tpi.Application.Services;
 
-public class ProductManagementService
+public class ProductsManagementService
 {
     private readonly IRepository _repository;
-    public ProductManagementService(IRepository repository)
+    public ProductsManagementService(IRepository repository)
     {
         _repository = repository;
     }
@@ -29,12 +29,13 @@ public class ProductManagementService
             product.Description,
             product.CurrentUnitPrice,
             product.StockQuantity,
-            product.IsActive) : null;
+            product.IsActive)
+            : null;
     }
 
     public async Task<IEnumerable<ProductModel.Response>?> GetProducts()
     {
-        return(await _repository.GetFiltered<Product>(p => p.IsActive))?.Select(p => new ProductModel.Response(
+        return (await _repository.GetFiltered<Product>(p => p.IsActive))?.Select(p => new ProductModel.Response(
             p.Id,
             p.Sku,
             p.InternalCode,
@@ -49,8 +50,8 @@ public class ProductManagementService
     {
         if (string.IsNullOrWhiteSpace(request.Sku) ||
             string.IsNullOrWhiteSpace(request.Name) ||
-            request.CurrentUnitPrice <= 0 || 
-            request.StockQuantity < 0) 
+            request.CurrentUnitPrice <= 0 ||
+            request.StockQuantity < 0)
         {
             throw new ArgumentException("Los datos del producto son inválidos.");
         }
@@ -58,7 +59,13 @@ public class ProductManagementService
         var exist = await _repository.First<Product>(p => p.Sku == request.Sku);
         if (exist != null) throw new DuplicatedEntityException($"Ya existe un producto con el Sku {request.Sku}");
 
-        var product = new Product(request.Sku, request.InternalCode, request.Name, request.Description, request.CurrentUnitPrice, request.StockQuantity);
+        var product = new Product(request.Sku,
+            request.InternalCode,
+            request.Name,
+            request.Description,
+            request.CurrentUnitPrice,
+            request.StockQuantity);
+
         await _repository.Add(product);
 
         return new ProductModel.Response(
@@ -70,5 +77,41 @@ public class ProductManagementService
             product.CurrentUnitPrice,
             product.StockQuantity,
             product.IsActive);
+    }
+
+    public async Task<ProductModel.Response?> Update(Guid id, ProductModel.Request request)
+    {
+        var product = await _repository.GetById<Product>(id);
+        if (product == null)
+        {
+            throw new EntityNotFoundException($"No se encontró un producto con el ID {id}");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Sku) ||
+            string.IsNullOrWhiteSpace(request.Name) ||
+            request.CurrentUnitPrice <= 0 ||
+            request.StockQuantity < 0)
+        {
+            throw new ArgumentException("Los datos del producto son inválidos.");
+        }
+
+        product.Sku = request.Sku;
+        product.InternalCode = request.InternalCode;
+        product.Name = request.Name;
+        product.Description = request.Description;
+        product.CurrentUnitPrice = request.CurrentUnitPrice;
+        product.StockQuantity = request.StockQuantity;
+
+        var updatedProduct = await _repository.Update(product);
+
+        return new ProductModel.Response(
+            updatedProduct.Id,
+            updatedProduct.Sku,
+            updatedProduct.InternalCode,
+            updatedProduct.Name,
+            updatedProduct.Description,
+            updatedProduct.CurrentUnitPrice,
+            updatedProduct.StockQuantity,
+            updatedProduct.IsActive);
     }
 }
