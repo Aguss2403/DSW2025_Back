@@ -13,34 +13,69 @@ namespace Dsw2025Tpi.Application.Services;
 public class OrdersManagementService
 {
     private readonly IRepository _repository;
+
     public OrdersManagementService(IRepository repository)
     {
         _repository = repository;
     }
 
-    //public async Task<ProductModel.Response> AddOrder(ProductModel.Request request)
-    //{
-    //    if (string.IsNullOrWhiteSpace(request.Sku) ||
-    //        string.IsNullOrWhiteSpace(request.Name) ||
-    //        request.CurrentUnitPrice <= 0 ||
-    //        request.StockQuantity < 0)
-    //    {
-    //        throw new ArgumentException("Los datos del producto son inválidos.");
-    //    }
+    public async Task<OrderModel.OrderResponse> AddOrder(OrderModel.OrderRequest request)
+    {
+        var customer = await _repository.GetById<Customer>(request.CustomerId);
+        if (customer == null)
+            throw new EntityNotFoundException($"No se encontró el cliente con ID {request.CustomerId}");
 
-    //    var exist = await _repository.First<Product>(p => p.Sku == request.Sku);
-    //    if (exist != null) throw new DuplicatedEntityException($"Ya existe un producto con el Sku {request.Sku}");
+        var orderItems = new List<OrderItem>();
+        foreach (var item in request.OrderItems)
+        {
+            var product = await _repository.GetById<Product>(item.ProductId);
+            if (product == null)
+                throw new EntityNotFoundException($"No se encontró el producto con ID {item.ProductId}");
 
-    //    var product = new Product(request.Sku,
-    //        request.InternalCode,
-    //        request.Name,
-    //        request.Description,
-    //        request.CurrentUnitPrice,
-    //        request.StockQuantity);
+            if (!product.HasSufficientStock(item.Quantity))
+                throw new InvalidOperationException($"Stock insuficiente para el producto {product.Name}.");
 
-    //    await _repository.Add(product);
+            product.DecreaseStock(item.Quantity);
+            await _repository.Update(product);
 
-    //    //return MapToResponse(product);
-    //}
+            var orderItem = new OrderItem
+            {
+                ProductId = product.Id,
+                Product = product,
+                Quantity = item.Quantity,
+                UnitPrice = product.CurrentUnitPrice
+            };
+            orderItem.SubTotal = orderItem.CalculateSubTotal();
 
+            orderItems.Add(orderItem);
+        }
+
+        var order = new Order(
+            request.ShippingAddress,
+            request.BillingAddress,
+            request.Notes,
+            orderItems,
+            request.CustomerId
+        );
+
+        await _repository.Add(order);
+
+        var response = new OrderModel.OrderResponse(
+            order.Id,
+            order.CustomerId,
+            order.ShippingAddress,
+            order.BillingAddress,
+            order.Notes,
+            orderItems.Select(oi => new OrderModel.OrderItemResponse(
+                oi.ProductId,
+                oi.Product.Name,
+                oi.UnitPrice,
+                oi.Quantity,
+                oi.SubTotal
+            )).ToList(),
+            order.Status.ToString()
+        );
+
+        return response;
+    }
 }

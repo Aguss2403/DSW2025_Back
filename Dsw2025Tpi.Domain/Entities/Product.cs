@@ -15,7 +15,7 @@ public class Product : EntityBase
     public decimal CurrentUnitPrice { get; set; }
     public int StockQuantity { get; set; }
     public bool IsActive { get; set; }
-    
+
     public Product(string sku, string internalCode, string name, string description, decimal currentUnitPrice, int stockQuantity)
     {
         Sku = sku;
@@ -29,21 +29,13 @@ public class Product : EntityBase
 
     public bool HasSufficientStock(int quantity)
     {
-        return StockQuantity >= quantity;
+        return StockQuantity >= quantity; // Ensure stock validation logic
     }
+
     public void DecreaseStock(int quantity)
     {
-        if(quantity <= 0)
-        {
-            throw new ArgumentException("La cantidad de stock no puede ser cero.", nameof(quantity));
-        }
-        if (!HasSufficientStock(quantity))
-        {
-            throw new InvalidOperationException($"Stock insuficiente para el producto " +
-                $"{Name}, Disponible: {StockQuantity}, Solicitado: {quantity}");
-        }
+        if (quantity > StockQuantity)
+            throw new InvalidOperationException("Stock insuficiente.");
+        StockQuantity -= quantity; // Update stock correctly
     }
-
-
 }
-
