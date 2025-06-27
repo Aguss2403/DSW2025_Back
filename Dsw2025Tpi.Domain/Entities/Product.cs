@@ -34,8 +34,6 @@ public class Product : EntityBase
 
     public void DecreaseStock(int quantity)
     {
-        if (quantity > StockQuantity)
-            throw new InvalidOperationException("Stock insuficiente.");
         StockQuantity -= quantity; // Update stock correctly
     }
 }

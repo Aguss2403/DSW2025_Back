@@ -1,6 +1,6 @@
 ﻿namespace Dsw2025Tpi.Domain.Entities;
 
-public class OrderItem : EntityBase // Quitado IOrderItemService
+public class OrderItem : EntityBase
 {
     public int Quantity { get; set; }
     public decimal UnitPrice { get; set; }
@@ -25,7 +25,6 @@ public class OrderItem : EntityBase // Quitado IOrderItemService
         UnitPrice = product.CurrentUnitPrice;
         SubTotal = CalculateSubTotal();
         OrderId = Order.Id;
-        // El Order se setea desde la clase Order al agregar items
     }
 
     public decimal CalculateSubTotal() => UnitPrice * Quantity;

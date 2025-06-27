@@ -18,7 +18,6 @@ public static class DbContextExtensions
         var entities = JsonSerializer.Deserialize<List<T>>(json, new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true,
-            Converters = { new JsonStringEnumConverter() }
         });
         if(entities == null || entities.Count == 0) return;
         try

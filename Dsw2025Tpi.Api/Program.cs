@@ -25,11 +25,7 @@ public class Program
         builder.Services.AddSwaggerGen();
         builder.Services.AddHealthChecks();
 
-
         builder.Services.AddDomainServices(builder.Configuration);
-
-
-
 
         builder.Services.AddTransient<ProductsManagementService>();
         builder.Services.AddTransient<OrdersManagementService>();
