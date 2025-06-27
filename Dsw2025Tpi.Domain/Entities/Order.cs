@@ -7,13 +7,10 @@ public class Order : EntityBase
     public string BillingAddress { get; set; }
     public string Notes { get; set; }
     public decimal TotalAmount { get; private set; }
-
     public Guid CustomerId { get; set; }
     public Customer Customer { get; set; }
-
     public List<OrderItem> OrderItems { get; set; } = new();
-
-    public OrderStatus Status { get; set; } = OrderStatus.Pending;
+    public OrderStatus Status { get; set; }
 
     public Order() { }
 
@@ -26,6 +23,7 @@ public class Order : EntityBase
         OrderItems = orderItems ?? new List<OrderItem>();
         CustomerId = customerId;
         TotalAmount = CalculateTotalAmount();
+        Status = OrderStatus.Pending;
     }
 
     public decimal CalculateTotalAmount() => OrderItems.Sum(item => item.SubTotal);

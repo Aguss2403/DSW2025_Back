@@ -11,8 +11,8 @@ namespace Dsw2025Tpi.Api.Controllers;
 [Route("api/products/")]
 public class ProductController : ControllerBase
 {
-    private readonly ProductsManagementService _service;
-    public ProductController(ProductsManagementService service)
+    private readonly IProductsManagementService _service;
+    public ProductController(IProductsManagementService service)
     {
         _service = service;
     }

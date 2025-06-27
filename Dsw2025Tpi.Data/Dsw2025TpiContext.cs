@@ -28,6 +28,7 @@ public class Dsw2025TpiContext : DbContext
             eb.HasKey(p => p.Id);
             eb.Property(p => p.Sku).HasMaxLength(20).IsRequired();
             eb.Property(p => p.Name).HasMaxLength(50).IsRequired();
+            eb.Property(p => p.InternalCode).HasMaxLength(30).IsRequired();
             eb.Property(p => p.Description).HasMaxLength(250);
             eb.Property(p => p.CurrentUnitPrice).HasColumnType("decimal(18,2)").IsRequired();
             eb.Property(p => p.StockQuantity).IsRequired();
@@ -42,7 +43,6 @@ public class Dsw2025TpiContext : DbContext
             eb.Property(o => o.BillingAddress).HasMaxLength(150).IsRequired();
             eb.Property(o => o.Notes).HasMaxLength(500);
             eb.Property(o => o.TotalAmount).HasColumnType("decimal(18,2)").IsRequired();
-            
         });
         modelBuilder.Entity<OrderItem>(eb =>
         {

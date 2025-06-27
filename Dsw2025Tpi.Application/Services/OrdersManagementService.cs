@@ -10,13 +10,15 @@ using System.Threading.Tasks;
 
 namespace Dsw2025Tpi.Application.Services;
 
-public class OrdersManagementService
+public class OrdersManagementService : IOrdersManagementService
 {
     private readonly IRepository _repository;
+
 
     public OrdersManagementService(IRepository repository)
     {
         _repository = repository;
+
     }
 
     public async Task<OrderModel.OrderResponse> AddOrder(OrderModel.OrderRequest request)

@@ -9,9 +9,10 @@ namespace Dsw2025Ej15.Api.Controllers;
 [Route("api/orders/")]
 public class OrderController : ControllerBase
 {
-    private readonly OrdersManagementService _service;
+    private readonly IOrdersManagementService _service;
 
-    public OrderController(OrdersManagementService service)
+
+    public OrderController(IOrdersManagementService service)
     {
         _service = service;
     }

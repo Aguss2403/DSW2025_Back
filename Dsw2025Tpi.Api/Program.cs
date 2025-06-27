@@ -27,8 +27,14 @@ public class Program
 
         builder.Services.AddDomainServices(builder.Configuration);
 
-        builder.Services.AddTransient<ProductsManagementService>();
-        builder.Services.AddTransient<OrdersManagementService>();
+
+
+        //builder.Services.AddScoped<IProductsManagementService, ProductsManagementService>();
+        builder.Services.AddTransient<IProductsManagementService,ProductsManagementService>();
+        //builder.Services.AddTransient<ProductsManagementService>();
+        //builder.Services.AddScoped<IOrdersManagementService,OrdersManagementService>();
+        //builder.Services.AddTransient<OrdersManagementService>();
+        builder.Services.AddTransient<IOrdersManagementService,OrdersManagementService>();
 
         builder.Services.AddScoped<IRepository, EfRepository>();
 
