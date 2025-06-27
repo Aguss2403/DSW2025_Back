@@ -9,10 +9,10 @@ namespace Dsw2025Tpi.Api.Controllers;
 
 [ApiController]
 [Route("api/products/")]
-public class ProductController : ControllerBase
+public class ProductsController : ControllerBase
 {
     private readonly IProductsManagementService _service;
-    public ProductController(IProductsManagementService service)
+    public ProductsController(IProductsManagementService service)
     {
         _service = service;
     }
@@ -29,7 +29,7 @@ public class ProductController : ControllerBase
     public async Task<IActionResult> GetProductBySku(Guid id)
     {
         var product = await _service.GetProductById(id);
-        if (product == null) return NotFound();
+        if (product == null) return NotFound($"No se encontro producto con Id: {id}");
         return Ok(product);
     }
 
