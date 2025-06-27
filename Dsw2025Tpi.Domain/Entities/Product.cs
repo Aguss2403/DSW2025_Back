@@ -29,11 +29,11 @@ public class Product : EntityBase
 
     public bool HasSufficientStock(int quantity)
     {
-        return StockQuantity >= quantity; // Ensure stock validation logic
+        return StockQuantity >= quantity;
     }
 
     public void DecreaseStock(int quantity)
     {
-        StockQuantity -= quantity; // Update stock correctly
+        StockQuantity -= quantity;
     }
 }

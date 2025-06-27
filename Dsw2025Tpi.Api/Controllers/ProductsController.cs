@@ -1,6 +1,6 @@
 ﻿using Dsw2025Ej15.Application.Exceptions;
 using Dsw2025Tpi.Application.Dtos;
-using Dsw2025Tpi.Application.Services;
+using Dsw2025Tpi.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
 using System.Threading.Tasks;
@@ -18,23 +18,44 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet()]
-    public async Task<IActionResult> GetProducts()
+    public async Task<IActionResult> GetAllProducts()
     {
-        var products = await _service.GetProducts();
-        if (products == null || !products.Any()) return NoContent();
-        return Ok(products);
+        try
+        {
+            var products = await _service.GetProducts();
+            return Ok(products);
+        }
+        catch (EntityNotFoundException enfe)
+        {
+            return StatusCode(204, enfe.Message);
+        }
+        catch (Exception ex)
+        {
+            return Problem(ex.Message);
+        }     
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetProductBySku(Guid id)
+    public async Task<IActionResult> GetProduct(Guid id)
     {
-        var product = await _service.GetProductById(id);
-        if (product == null) return NotFound($"No se encontro producto con Id: {id}");
-        return Ok(product);
+        try
+        {
+            var product = await _service.GetProductById(id);
+            return Ok(product);
+        }
+        catch (EntityNotFoundException enfe)
+        {
+            return NotFound(enfe.Message);
+        }
+        catch (Exception ex)
+        {
+            return Problem(ex.Message);
+        }
+
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddProduct([FromBody]ProductModel.Request request)
+    public async Task<IActionResult> AddProduct([FromBody]ProductModel.ProductRequest request)
     {
         try
         {
@@ -45,22 +66,18 @@ public class ProductsController : ControllerBase
         {
             return BadRequest(ae.Message);
         }
-        catch (System.ApplicationException de)
-        {
-            return Conflict(de.Message);
-        }
         catch (DuplicatedEntityException de)
         {
             return BadRequest(de.Message);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            return Problem("Se produjo un error al guardar el producto");
+            return Problem(ex.Message);
         }
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] ProductModel.Request request)
+    public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] ProductModel.ProductRequest request)
     {
         try
         {
@@ -80,9 +97,9 @@ public class ProductsController : ControllerBase
         {
             return Conflict(de.Message);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            return Problem("Se produjo un error al actualizar el producto");
+            return Problem(ex.Message);
         }
     }
 
@@ -103,15 +120,9 @@ public class ProductsController : ControllerBase
         {
             return BadRequest(ae.Message);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            return Problem("Se produjo un error al actualizar el estado del producto");
+            return Problem(ex.Message);
         }
     }
-
-
-
-
-
-
 }

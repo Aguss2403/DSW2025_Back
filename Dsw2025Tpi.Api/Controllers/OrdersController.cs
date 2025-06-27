@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Dsw2025Tpi.Application.Services;
 using Dsw2025Tpi.Application.Dtos;
 using Dsw2025Ej15.Application.Exceptions;
+using Dsw2025Tpi.Application.Interfaces;
 
 namespace Dsw2025Ej15.Api.Controllers;
 
@@ -10,18 +10,28 @@ namespace Dsw2025Ej15.Api.Controllers;
 public class OrdersController : ControllerBase
 {
     private readonly IOrdersManagementService _service;
-
-
     public OrdersController(IOrdersManagementService service)
     {
         _service = service;
     }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetOrderById(Guid id)
+    [HttpGet()]
+    public async Task<IActionResult> GetAllOrders()
     {
-        // Implementación real pendiente
-        return Ok();
+        try
+        {
+            var orders = await _service.GetOrders();
+            return Ok(orders);
+        }
+        catch (EntityNotFoundException enfe)
+        {
+            return StatusCode(204, enfe.Message);
+        }
+        catch (Exception ex)
+        {
+            return Problem(ex.Message);
+        }
+        
     }
 
     [HttpPost]
@@ -43,10 +53,6 @@ public class OrdersController : ControllerBase
         catch (EntityNotFoundException enfe)
         {
             return NotFound(enfe.Message);
-        }
-        catch (DuplicatedEntityException de)
-        {
-            return Conflict(de.Message);
         }
         catch (Exception ex)
         {

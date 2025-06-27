@@ -26,17 +26,7 @@ public class Program
         builder.Services.AddHealthChecks();
 
         builder.Services.AddDomainServices(builder.Configuration);
-
-
-
-        //builder.Services.AddScoped<IProductsManagementService, ProductsManagementService>();
-        builder.Services.AddTransient<IProductsManagementService,ProductsManagementService>();
-        //builder.Services.AddTransient<ProductsManagementService>();
-        //builder.Services.AddScoped<IOrdersManagementService,OrdersManagementService>();
-        //builder.Services.AddTransient<OrdersManagementService>();
-        builder.Services.AddTransient<IOrdersManagementService,OrdersManagementService>();
-
-        builder.Services.AddScoped<IRepository, EfRepository>();
+        builder.Services.AddDependencyInjection();
 
         var app = builder.Build();
 

@@ -1,5 +1,6 @@
 ﻿using Dsw2025Ej15.Application.Exceptions;
 using Dsw2025Tpi.Application.Dtos;
+using Dsw2025Tpi.Application.Interfaces;
 using Dsw2025Tpi.Domain.Entities;
 using Dsw2025Tpi.Domain.Interfaces;
 using System;
@@ -18,7 +19,6 @@ public class OrdersManagementService : IOrdersManagementService
     public OrdersManagementService(IRepository repository)
     {
         _repository = repository;
-
     }
 
     public async Task<OrderModel.OrderResponse> AddOrder(OrderModel.OrderRequest request)
@@ -36,8 +36,8 @@ public class OrdersManagementService : IOrdersManagementService
 
             if (!product.HasSufficientStock(item.Quantity))
                 throw new InvalidOperationException($"Stock insuficiente para el producto {product.Name}.");
-
             product.DecreaseStock(item.Quantity);
+            
             await _repository.Update(product);
 
             var orderItem = new OrderItem
@@ -48,7 +48,6 @@ public class OrdersManagementService : IOrdersManagementService
                 UnitPrice = product.CurrentUnitPrice
             };
             orderItem.SubTotal = orderItem.CalculateSubTotal();
-
             orderItems.Add(orderItem);
         }
 
@@ -79,5 +78,26 @@ public class OrdersManagementService : IOrdersManagementService
         );
 
         return response;
+    }
+
+    public async Task<List<OrderModel.OrderResponse>?> GetOrders()
+    {
+        var orders = await _repository.GetAll<Order>(include: new[] { "OrderItems", "OrderItems.Product" });
+        if (orders == null || !orders.Any())
+            throw new EntityNotFoundException("No se encontraron órdenes.");
+
+        return orders.Select(o => new OrderModel.OrderResponse(
+        o.Id,
+        o.CustomerId,
+        o.ShippingAddress,
+        o.BillingAddress,
+        o.Notes,
+        o.OrderItems.Select(oi => new OrderModel.OrderItemResponse(
+            oi.ProductId,
+            oi.Product.Name,
+            oi.UnitPrice,
+            oi.Quantity,
+            oi.SubTotal
+        )).ToList(), o.Status.ToString())).ToList();    
     }
 }

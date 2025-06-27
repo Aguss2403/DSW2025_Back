@@ -26,7 +26,7 @@ public record OrderModel
         string OrderStatus
         );
 
-    public record OrderItemRequest( //Crear un model de orderitem
+    public record OrderItemRequest( 
         Guid ProductId,
         int Quantity
     );
