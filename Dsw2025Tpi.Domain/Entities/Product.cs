@@ -15,6 +15,7 @@ public class Product : EntityBase
     public decimal CurrentUnitPrice { get; set; }
     public int StockQuantity { get; set; }
     public bool IsActive { get; set; }
+
     public Product(string sku, string internalCode, string name, string description, decimal currentUnitPrice, int stockQuantity)
     {
         Sku = sku;
@@ -24,5 +25,15 @@ public class Product : EntityBase
         CurrentUnitPrice = currentUnitPrice;
         StockQuantity = stockQuantity;
         IsActive = true;
+    }
+
+    public bool HasSufficientStock(int quantity)
+    {
+        return StockQuantity >= quantity;
+    }
+
+    public void DecreaseStock(int quantity)
+    {
+        StockQuantity -= quantity;
     }
 }
