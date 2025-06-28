@@ -25,7 +25,7 @@ public class OrdersController : ControllerBase
         }
         catch (EntityNotFoundException enfe)
         {
-            return StatusCode(204, enfe.Message);
+            return NoContent();
         }
         catch (Exception ex)
         {

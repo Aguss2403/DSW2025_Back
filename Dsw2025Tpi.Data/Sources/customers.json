@@ -1,72 +1,32 @@
 [
   {
-    "id": 1,
+    "id": "0f7b1c4f-cf53-45a2-91b4-89fb42d5a2d1",
     "name": "Juan Pérez",
     "email": "juanpérez@example.com",
-    "phoneNumber": "+541163354044",
-    "orders": []
+    "phoneNumber": "+541163354044"
   },
   {
-    "id": 2,
+    "id": "fa4e19d3-bba4-489f-89b2-40cf4d7e1687",
     "name": "Ana Gómez",
     "email": "anagómez@example.com",
-    "phoneNumber": "+541120955605",
-    "orders": []
+    "phoneNumber": "+541120955605"
   },
   {
-    "id": 3,
+    "id": "9a5b36f5-923e-4d0d-8790-32528b8168d9",
     "name": "Carlos Ruiz",
     "email": "carlosruiz@example.com",
-    "phoneNumber": "+541151392619",
-    "orders": []
+    "phoneNumber": "+541151392619"
   },
   {
-    "id": 4,
+    "id": "b665a2e1-122e-42b8-85c0-6bc0c9e84b3e",
     "name": "Lucía Fernández",
     "email": "lucíafernández@example.com",
-    "phoneNumber": "+541135032500",
-    "orders": []
+    "phoneNumber": "+541135032500"
   },
   {
-    "id": 5,
+    "id": "2d79db5e-0aeb-4f6d-8e9c-6f52094f3472",
     "name": "Martín López",
     "email": "martínlópez@example.com",
-    "phoneNumber": "+541155672187",
-    "orders": []
-  },
-  {
-    "id": 6,
-    "name": "Sofía Martínez",
-    "email": "sofíamartínez@example.com",
-    "phoneNumber": "+541177400489",
-    "orders": []
-  },
-  {
-    "id": 7,
-    "name": "Diego Torres",
-    "email": "diegotorres@example.com",
-    "phoneNumber": "+541168433560",
-    "orders": []
-  },
-  {
-    "id": 8,
-    "name": "María Álvarez",
-    "email": "maríaálvarez@example.com",
-    "phoneNumber": "+541165050997",
-    "orders": []
-  },
-  {
-    "id": 9,
-    "name": "Pedro González",
-    "email": "pedrogonzález@example.com",
-    "phoneNumber": "+541171299114",
-    "orders": []
-  },
-  {
-    "id": 10,
-    "name": "Valentina Romero",
-    "email": "valentinaromero@example.com",
-    "phoneNumber": "+541134984919",
-    "orders": []
+    "phoneNumber": "+541155672187"
   }
 ]

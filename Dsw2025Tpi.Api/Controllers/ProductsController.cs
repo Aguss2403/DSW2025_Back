@@ -27,7 +27,7 @@ public class ProductsController : ControllerBase
         }
         catch (EntityNotFoundException enfe)
         {
-            return StatusCode(204, enfe.Message);
+            return NoContent();
         }
         catch (Exception ex)
         {
@@ -51,7 +51,6 @@ public class ProductsController : ControllerBase
         {
             return Problem(ex.Message);
         }
-
     }
 
     [HttpPost]
@@ -82,7 +81,6 @@ public class ProductsController : ControllerBase
         try
         {
             var updatedProduct = await _service.Update(id, request);
-            if (updatedProduct == null) throw new EntityNotFoundException($"No se encontró un producto con el ID {id}");
             return Ok(updatedProduct);
         }
         catch (EntityNotFoundException ef)
@@ -109,7 +107,6 @@ public class ProductsController : ControllerBase
         try
         {
             var updatedProduct = await _service.ToggleStatus(id);
-            if (updatedProduct == null) throw new EntityNotFoundException($"No se encontró un producto con el ID {id}");
             return Ok(updatedProduct);
         }
         catch (EntityNotFoundException ef)
@@ -126,3 +123,4 @@ public class ProductsController : ControllerBase
         }
     }
 }
+

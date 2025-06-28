@@ -22,7 +22,7 @@ public class ProductsManagementService : IProductsManagementService
         _repository = repository;
 
     }
-    public void ValidateRequest(ProductRequest request)
+    private void ValidateRequest(ProductRequest request)
     {
         var errors = new List<string>();
 
@@ -134,5 +134,13 @@ public class ProductsManagementService : IProductsManagementService
         var updatedProduct = await _repository.Update(product);
 
         return MapToResponse(product);
+    }
+
+    public async Task<Product> GetProductByIdAsync(Guid id)
+    {
+        var product = await _repository.GetById<Product>(id);
+        if (product == null)
+            throw new EntityNotFoundException($"No existe el producto con Id: {id}");
+        return product;
     }
 }
