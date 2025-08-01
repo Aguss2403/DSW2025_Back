@@ -102,7 +102,6 @@ public class OrdersManagementService : IOrdersManagementService
         );
     }
 
-
     public async Task<List<OrderModel.OrderResponse>?> GetOrders()
     {
         var orders = await _repository.GetAll<Order>(include: new[] { "OrderItems", "OrderItems.Product" });
@@ -126,7 +125,7 @@ public class OrdersManagementService : IOrdersManagementService
 
     public async Task<OrderModel.OrderResponse> UpdateOrderStatus(Guid id, OrderModel.OrderStatusRequest request)
     {
-        var order = await _repository.GetById<Order>(id);
+        var order = await _repository.GetById<Order>(id, include: new[] { "OrderItems", "OrderItems.Product" });
         if (order == null)
             throw new EntityNotFoundException($"No se encontró un producto con el ID {id}");
 

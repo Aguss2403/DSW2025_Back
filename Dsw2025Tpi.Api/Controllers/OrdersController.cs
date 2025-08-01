@@ -8,7 +8,7 @@ namespace Dsw2025Ej15.Api.Controllers;
 
 [ApiController]
 [Route("api/orders/")]
-//[Authorize]
+[Authorize]
 public class OrdersController : ControllerBase
 {
     private readonly IOrdersManagementService _service;
