@@ -118,6 +118,7 @@ public class Program
 
         app.UseHttpsRedirection();
 
+       // app.UseCors("PermitirFrontend");
         app.UseAuthentication();
         app.UseAuthorization();
 

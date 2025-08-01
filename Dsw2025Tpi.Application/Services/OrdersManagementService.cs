@@ -80,6 +80,29 @@ public class OrdersManagementService : IOrdersManagementService
         return response;
     }
 
+    public async Task<OrderModel.OrderResponse?> GetOrderById(Guid id)
+    {
+        var order = await _repository.GetById<Order>(id);
+        if (order == null)
+            throw new EntityNotFoundException($"No se encontró la orden con ID {id}");
+
+        return new OrderModel.OrderResponse(
+            order.Id,
+            order.CustomerId,
+            order.ShippingAddress,
+            order.BillingAddress,
+            order.Notes,
+            order.OrderItems.Select(oi => new OrderModel.OrderItemResponse(
+                oi.ProductId,
+                oi.Product.Name,
+                oi.UnitPrice,
+                oi.Quantity,
+                oi.SubTotal)).ToList(),
+            order.Status.ToString()
+        );
+    }
+
+
     public async Task<List<OrderModel.OrderResponse>?> GetOrders()
     {
         var orders = await _repository.GetAll<Order>(include: new[] { "OrderItems", "OrderItems.Product" });
@@ -100,4 +123,36 @@ public class OrdersManagementService : IOrdersManagementService
             oi.SubTotal
         )).ToList(), o.Status.ToString())).ToList();    
     }
+
+    /*public async Task<OrderModel.OrderResponse> UpdateOrderStatus(Guid id, OrderModel.OrderRequest request)
+    {
+        var order = await _repository.GetById<Order>(id);
+        if (order == null)
+            throw new EntityNotFoundException($"No se encontró un producto con el ID {id}");
+
+        if (string.IsNullOrWhiteSpace(request.OrderStatus))
+            throw new ArgumentException("El estado del pedido no puede estar vacío.");
+
+        if(!Enum.TryParse<OrderStatus>(request.OrderStatus, true, out var newStatus))
+            throw new InvalidOperationException($"El estado '{request.OrderStatus}'no válido.");
+
+        order.Status = newStatus;
+        await _repository.Update(order);
+
+        return new OrderModel.OrderResponse(
+            order.Id,
+            order.CustomerId,
+            order.ShippingAddress,
+            order.BillingAddress,
+            order.Notes,
+            order.OrderItems.Select(oi => new OrderModel.OrderItemResponse(
+                oi.ProductId,
+                oi.Product.Name,
+                oi.UnitPrice,
+                oi.Quantity,
+                oi.SubTotal
+            )).ToList(),
+            order.Status.ToString()
+        );
+    }*/
 }
