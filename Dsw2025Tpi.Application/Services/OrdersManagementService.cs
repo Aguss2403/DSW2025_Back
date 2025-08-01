@@ -82,7 +82,7 @@ public class OrdersManagementService : IOrdersManagementService
 
     public async Task<OrderModel.OrderResponse?> GetOrderById(Guid id)
     {
-        var order = await _repository.GetById<Order>(id);
+        var order = await _repository.GetById<Order>(id, include: new[] { "OrderItems", "OrderItems.Product" });
         if (order == null)
             throw new EntityNotFoundException($"No se encontró la orden con ID {id}");
 
@@ -124,7 +124,7 @@ public class OrdersManagementService : IOrdersManagementService
         )).ToList(), o.Status.ToString())).ToList();    
     }
 
-    /*public async Task<OrderModel.OrderResponse> UpdateOrderStatus(Guid id, OrderModel.OrderRequest request)
+    public async Task<OrderModel.OrderResponse> UpdateOrderStatus(Guid id, OrderModel.OrderStatusRequest request)
     {
         var order = await _repository.GetById<Order>(id);
         if (order == null)
@@ -154,5 +154,5 @@ public class OrdersManagementService : IOrdersManagementService
             )).ToList(),
             order.Status.ToString()
         );
-    }*/
+    }
 }

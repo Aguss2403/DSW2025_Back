@@ -16,6 +16,7 @@ public record OrderModel
         string Notes,
         List<OrderItemRequest> OrderItems
         );
+
     public record OrderResponse(
         Guid Id,
         Guid CustomerId,
@@ -38,4 +39,7 @@ public record OrderModel
         int Quantity,
         decimal SubTotal
     );
+
+    public record OrderStatusRequest(
+        string OrderStatus);
 }

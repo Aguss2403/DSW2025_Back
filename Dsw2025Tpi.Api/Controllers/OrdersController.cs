@@ -8,7 +8,7 @@ namespace Dsw2025Ej15.Api.Controllers;
 
 [ApiController]
 [Route("api/orders/")]
-[Authorize]
+//[Authorize]
 public class OrdersController : ControllerBase
 {
     private readonly IOrdersManagementService _service;
@@ -17,7 +17,7 @@ public class OrdersController : ControllerBase
         _service = service;
     }
 
-    [HttpGet]//Endpoint 7
+    [HttpGet]//7
     public async Task<IActionResult> GetAllOrders()
     {
         try
@@ -36,7 +36,7 @@ public class OrdersController : ControllerBase
 
     }
 
-    [HttpPost]//Endpoint 6
+    [HttpPost]//6
     public async Task<IActionResult> CreateOrder([FromBody] OrderModel.OrderRequest request)
     {
         try
@@ -62,7 +62,7 @@ public class OrdersController : ControllerBase
         }
     }
 
-    [HttpGet]//8
+    [HttpGet("{id}")]//8
     public async Task<IActionResult> GetOrderById(Guid id)
     {
         try
@@ -80,25 +80,25 @@ public class OrdersController : ControllerBase
         }
     }
 
-    //[HttpPut("{id}/status")]//9
-    //public async Task<IActionResult> UpdateOrderStatus(Guid id, [FromBody] OrderModel.OrderRequest request)
-    //{
-    //    try
-    //    {
-    //        var order = await _service.UpdateOrderStatus(id, request);
-    //        return Ok(order);
-    //    }
-    //    catch (EntityNotFoundException enfe)
-    //    {
-    //        return NotFound(enfe.Message);
-    //    }
-    //    catch (ArgumentException ae)
-    //    {
-    //        return BadRequest(ae.Message);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        return Problem(ex.Message);
-    //    }
-    //}
+    [HttpPut("{id}/status")]//9
+    public async Task<IActionResult> UpdateOrderStatus(Guid id, [FromBody] OrderModel.OrderStatusRequest request)
+    {
+        try
+        {
+            var order = await _service.UpdateOrderStatus(id, request);
+            return Ok(order);
+        }
+        catch (EntityNotFoundException enfe)
+        {
+            return NotFound(enfe.Message);
+        }
+        catch (ArgumentException ae)
+        {
+            return BadRequest(ae.Message);
+        }
+        catch (Exception ex)
+        {
+            return Problem(ex.Message);
+        }
+    }
 }

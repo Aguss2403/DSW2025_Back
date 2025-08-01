@@ -10,7 +10,7 @@ namespace Dsw2025Tpi.Api.Controllers;
 
 [ApiController]
 [Route("api/products/")]
-[Authorize]
+//[Authorize]
 public class ProductsController : ControllerBase
 {
     private readonly IProductsManagementService _service;
@@ -20,7 +20,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet()]
-    [Authorize(Roles = "admin, user")]
+   // [Authorize(Roles = "admin, user")]
     public async Task<IActionResult> GetAllProducts()
     {
         try
@@ -58,7 +58,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "admin")]
+   // [Authorize(Roles = "admin")]
     public async Task<IActionResult> AddProduct([FromBody]ProductModel.ProductRequest request)
     {
         try
