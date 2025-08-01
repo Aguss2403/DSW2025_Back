@@ -2,11 +2,13 @@
 using Dsw2025Tpi.Application.Dtos;
 using Dsw2025Ej15.Application.Exceptions;
 using Dsw2025Tpi.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Dsw2025Ej15.Api.Controllers;
 
 [ApiController]
 [Route("api/orders/")]
+[Authorize]
 public class OrdersController : ControllerBase
 {
     private readonly IOrdersManagementService _service;
