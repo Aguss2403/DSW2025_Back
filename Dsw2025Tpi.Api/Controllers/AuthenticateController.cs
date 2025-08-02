@@ -11,7 +11,7 @@ namespace Dsw2025Tpi.Api.Controllers;
 
 public class AuthenticateController : Controller
 {
-   private readonly UserManager<IdentityUser> _userManager;
+    private readonly UserManager<IdentityUser> _userManager;
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly JwtTokenServices _jwtTokenServices;
     public AuthenticateController( 

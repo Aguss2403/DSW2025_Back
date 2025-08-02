@@ -63,6 +63,10 @@ public class Program
 
         builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
         {
+            options.User = new UserOptions
+            {
+                AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+"
+            };
             options.Password = new PasswordOptions
             {
                 RequireDigit = true,
