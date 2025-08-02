@@ -82,7 +82,7 @@ public class AuthenticateController : Controller
         {
             return BadRequest(result.Errors);
         }
-        await _userManager.AddToRoleAsync(user, "user");
+
         return Ok("Usuario registrado exitosamente.");
 
     }

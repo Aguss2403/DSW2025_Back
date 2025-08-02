@@ -51,7 +51,7 @@ public class Program
                         Reference = new OpenApiReference
                         {
                             Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer"
+                            Id = "Bearer" 
                         }
                     },
                     Array.Empty<string>()
@@ -65,7 +65,7 @@ public class Program
         {
             options.User = new UserOptions
             {
-                AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+"
+                AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+!¡"
             };
             options.Password = new PasswordOptions
             {
@@ -102,8 +102,7 @@ public class Program
             });
 
         builder.Services.AddDomainServices(builder.Configuration);
-        builder.Services.AddSingleton<JwtTokenServices>();
-
+       
         builder.Services.AddDbContext<AuthenticateContext>(options =>
         {
             options.UseSqlServer(builder.Configuration.GetConnectionString("Dsw2025TpiEntities"));
@@ -122,7 +121,6 @@ public class Program
 
         app.UseHttpsRedirection();
 
-       // app.UseCors("PermitirFrontend");
         app.UseAuthentication();
         app.UseAuthorization();
 

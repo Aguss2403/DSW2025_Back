@@ -33,6 +33,8 @@ public class OrdersManagementService : IOrdersManagementService
             var product = await _repository.GetById<Product>(item.ProductId);
             if (product == null)
                 throw new EntityNotFoundException($"No se encontró el producto con ID {item.ProductId}");
+            if (!product.IsActive)
+                throw new InvalidOperationException($" El producto {product.Name} esta inactivo");
 
             if (!product.HasSufficientStock(item.Quantity))
                 throw new InvalidOperationException($"Stock insuficiente para el producto {product.Name}.");
