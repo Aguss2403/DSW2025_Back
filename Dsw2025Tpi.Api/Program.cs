@@ -1,4 +1,5 @@
 
+using Dsw2025Tpi.Api.Data;
 using Dsw2025Tpi.Api.Utils;
 using Dsw2025Tpi.Application.Services;
 using Dsw2025Tpi.Data;
@@ -18,7 +19,7 @@ namespace Dsw2025Tpi.Api;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -125,6 +126,11 @@ public class Program
         app.MapControllers();
         
         app.MapHealthChecks("/healthcheck");
+        using (var scope = app.Services.CreateScope())
+        {
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            await RoleSeeder.SeedRolesAsync(roleManager);
+        }
 
         app.Run();
     }
