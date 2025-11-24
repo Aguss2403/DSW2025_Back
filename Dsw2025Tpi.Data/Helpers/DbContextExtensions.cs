@@ -14,16 +14,31 @@ public static class DbContextExtensions
     public static void SeedWork<T>(this Dsw2025TpiContext context, string dataSource) where T : class
     {
         if (context.Set<T>().Any()) return;
-        var json = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, dataSource));
-        var entities = JsonSerializer.Deserialize<List<T>>(json, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true,
-        });
-        if(entities == null || entities.Count == 0) return;
+
+        var jsonPath = Path.Combine(AppContext.BaseDirectory, dataSource);
+        var json = File.ReadAllText(jsonPath);
+
         try
         {
+            var entities = JsonSerializer.Deserialize<List<T>>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+            });
+
+            if (entities == null || entities.Count == 0)
+            {
+                Console.WriteLine($"No se encontraron entidades para insertar desde: {jsonPath}");
+                return;
+            }
+
             context.Set<T>().AddRange(entities);
             context.SaveChanges();
+        }
+        catch (JsonException jsonEx)
+        {
+            Console.WriteLine($"Error al deserializar JSON desde: {jsonPath}");
+            Console.WriteLine($"Mensaje: {jsonEx.Message}");
+            throw;
         }
         catch (Exception ex)
         {
@@ -35,4 +50,5 @@ public static class DbContextExtensions
             throw;
         }
     }
+
 }

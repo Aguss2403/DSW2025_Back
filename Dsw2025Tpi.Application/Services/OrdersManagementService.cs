@@ -74,6 +74,7 @@ public class OrdersManagementService : IOrdersManagementService
                 oi.Quantity,
                 oi.SubTotal
             )).ToList(),
+            order.TotalAmount,
             order.Status.ToString()
         );
 
@@ -110,18 +111,21 @@ public class OrdersManagementService : IOrdersManagementService
             throw new EntityNotFoundException("No se encontraron órdenes.");
 
         return orders.Select(o => new OrderModel.OrderResponse(
-        o.Id,
-        o.CustomerId,
-        o.ShippingAddress,
-        o.BillingAddress,
-        o.Notes,
-        o.OrderItems.Select(oi => new OrderModel.OrderItemResponse(
-            oi.ProductId,
-            oi.Product.Name,
-            oi.UnitPrice,
-            oi.Quantity,
-            oi.SubTotal
-        )).ToList(), o.Status.ToString())).ToList();    
+            o.Id,
+            o.CustomerId,
+            o.ShippingAddress,
+            o.BillingAddress,
+            o.Notes,
+            o.OrderItems.Select(oi => new OrderModel.OrderItemResponse(
+                oi.ProductId,
+                oi.Product.Name,
+                oi.UnitPrice,
+                oi.Quantity,
+                oi.SubTotal
+            )).ToList(), 
+            o.CalculateTotalAmount(), 
+            o.Status.ToString()
+        )).ToList();
     }
 
     public async Task<OrderModel.OrderResponse> UpdateOrderStatus(Guid id, string newOrderStatus)

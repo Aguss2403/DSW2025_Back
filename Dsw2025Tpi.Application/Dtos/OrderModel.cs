@@ -23,6 +23,7 @@ public record OrderModel
         string BillingAddress,
         string Notes,
         List<OrderItemResponse> OrderItems,
+        decimal TotalAmount,
         string OrderStatus
         );
 
