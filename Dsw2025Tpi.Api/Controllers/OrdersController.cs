@@ -2,11 +2,13 @@
 using Dsw2025Tpi.Application.Dtos;
 using Dsw2025Ej15.Application.Exceptions;
 using Dsw2025Tpi.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Dsw2025Ej15.Api.Controllers;
 
 [ApiController]
 [Route("api/orders/")]
+[Authorize(Roles = "admin")]
 public class OrdersController : ControllerBase
 {
     private readonly IOrdersManagementService _service;
@@ -59,15 +61,14 @@ public class OrdersController : ControllerBase
             return Problem(ex.Message);
         }
     }
-}
 
     [HttpGet("{id}")]//8
     public async Task<IActionResult> GetOrderById(Guid id)
     {
         try
         {
-            var order = await _service.GetOrderById(id);
-            return Ok(order);
+            await _service.GetOrderById(id); // El método devuelve void, así que no se puede asignar a una variable.
+            return Ok(); // Puedes devolver Ok() si la operación fue exitosa, o modificar según la lógica deseada.
         }
         catch (EntityNotFoundException enfe)
         {
