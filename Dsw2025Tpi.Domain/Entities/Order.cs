@@ -6,7 +6,7 @@ public class Order : EntityBase
     public string ShippingAddress { get; set; }
     public string BillingAddress { get; set; }
     public string Notes { get; set; }
-    public decimal TotalAmount { get; private set; }
+    public decimal TotalAmount { get; set; }
     public Guid CustomerId { get; set; }
     public Customer Customer { get; set; }
     public List<OrderItem> OrderItems { get; set; } = new();

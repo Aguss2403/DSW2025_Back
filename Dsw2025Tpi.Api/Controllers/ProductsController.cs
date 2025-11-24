@@ -44,6 +44,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] ProductModel.ProductRequest request)
     {
         var updatedProduct = await _service.Update(id, request);
@@ -51,6 +52,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPatch("{id}")]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> ToggleProductStatus(Guid id)
     {
         var updatedProduct = await _service.ToggleStatus(id);
@@ -71,3 +73,4 @@ public class ProductsController : ControllerBase
     }
 
 }
+

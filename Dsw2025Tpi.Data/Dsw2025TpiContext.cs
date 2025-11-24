@@ -43,6 +43,7 @@ public class Dsw2025TpiContext : DbContext
             eb.Property(o => o.BillingAddress).HasMaxLength(150).IsRequired();
             eb.Property(o => o.Notes).HasMaxLength(500);
             eb.Property(o => o.TotalAmount).HasColumnType("decimal(18,2)").IsRequired();
+            eb.Property(o => o.Status).IsRequired().HasConversion<string>().HasMaxLength(20);
         });
         modelBuilder.Entity<OrderItem>(eb =>
         {

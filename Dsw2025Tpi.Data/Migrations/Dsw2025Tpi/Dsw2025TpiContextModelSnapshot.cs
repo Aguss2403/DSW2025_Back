@@ -4,7 +4,6 @@ using Dsw2025Tpi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -12,15 +11,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dsw2025Tpi.Data.Migrations.Dsw2025Tpi
 {
     [DbContext(typeof(Dsw2025TpiContext))]
-<<<<<<<< HEAD:Dsw2025Tpi.Data/Migrations/Dsw2025Tpi/20251123234318_InitialCreate.Designer.cs
-    [Migration("20251123234318_InitialCreate")]
-========
-    [Migration("20250801154128_InitialCreate")]
->>>>>>>> origin/Dev_Lautaro:Dsw2025Tpi.Data/Migrations/20250801154128_InitialCreate.Designer.cs
-    partial class InitialCreate
+    partial class Dsw2025TpiContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
