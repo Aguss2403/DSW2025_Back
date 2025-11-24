@@ -6,7 +6,7 @@ namespace Dsw2025Tpi.Application.Interfaces
     {
         Task<ProductModel.ProductResponse> AddProduct(ProductModel.ProductRequest request);
         Task<ProductModel.ProductResponse?> GetProductById(Guid id);
-        Task<IEnumerable<ProductModel.ProductResponse>?> GetProducts();
+        Task<ProductModel.ResponsePagination?> GetProducts(ProductModel.FilterProduct? request = null);
         Task<ProductModel.ProductResponse?> ToggleStatus(Guid id);
         Task<ProductModel.ProductResponse?> Update(Guid id, ProductModel.ProductRequest request);
     }
