@@ -68,10 +68,16 @@ public class ProductsManagementService : IProductsManagementService
             : null;
     }
 
-    public async Task<ProductModel.ResponsePagination?> GetProducts(ProductModel.FilterProduct? request = null)
+    public async Task<ProductModel.ResponsePagination?> GetProducts(ProductModel.FilterProduct request)
     {
-        var activeProducts = await _repository.GetFiltered<Product>(p => p.IsActive);
-        if (activeProducts == null || !activeProducts.Any())
+        var isActive = request.Status == "enabled" ? (bool?) true :
+                       request.Status == "disabled" ? (bool?) false : null;
+        var activeProducts = await _repository.GetFiltered<Product>(p => (
+            (isActive == null || p.IsActive == isActive)
+            &&string.IsNullOrEmpty(request.Search) || p.Name.Contains(request.Search))
+            );
+
+        if (activeProducts is null || !activeProducts.Any())
             throw new EntityNotFoundException("No hay productos cargados");
 
         var products = activeProducts

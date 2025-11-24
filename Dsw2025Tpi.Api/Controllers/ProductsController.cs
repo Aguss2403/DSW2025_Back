@@ -21,9 +21,9 @@ public class ProductsController : ControllerBase
 
     [HttpGet()]
     [Authorize(Roles = "admin, user")]
-    public async Task<IActionResult> GetAllProducts()
+    public async Task<IActionResult> GetAllProducts([FromQuery] ProductModel.FilterProduct filter)
     {
-        var products = await _service.GetProducts();
+        var products = await _service.GetProducts(filter);
         return Ok(products);
     }
 
