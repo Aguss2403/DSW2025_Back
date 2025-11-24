@@ -1,18 +1,15 @@
-
 using Dsw2025Tpi.Api.Utils;
+using Dsw2025Tpi.Application.Interfaces;
 using Dsw2025Tpi.Application.Services;
 using Dsw2025Tpi.Data;
-using Dsw2025Tpi.Data.Helpers;
-using Dsw2025Tpi.Data.Repositories;
-using Dsw2025Tpi.Domain.Entities;
-using Dsw2025Tpi.Domain.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Dsw2025Tpi.Api.Middlewares;
 using System.Text;
+
 
 namespace Dsw2025Tpi.Api;
 
@@ -99,6 +96,7 @@ public class Program
 
         builder.Services.AddDomainServices(builder.Configuration);
         builder.Services.AddSingleton<JwtTokenServices>();
+        builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 
         builder.Services.AddDbContext<AuthenticateContext>(options =>
         {
@@ -117,8 +115,9 @@ public class Program
         }
 
         app.UseHttpsRedirection();
+        app.UseMiddleware<ExceptionHandler>();
 
-       // app.UseCors("PermitirFrontend");
+        // app.UseCors("PermitirFrontend");
         app.UseAuthentication();
         app.UseAuthorization();
 

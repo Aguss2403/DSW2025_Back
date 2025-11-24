@@ -124,17 +124,17 @@ public class OrdersManagementService : IOrdersManagementService
         )).ToList(), o.Status.ToString())).ToList();    
     }
 
-    /*public async Task<OrderModel.OrderResponse> UpdateOrderStatus(Guid id, OrderModel.OrderRequest request)
+    public async Task<OrderModel.OrderResponse> UpdateOrderStatus(Guid id, string newOrderStatus)
     {
+        if (string.IsNullOrWhiteSpace(newOrderStatus))
+            throw new ArgumentException("El estado del pedido no puede estar vacío.");
+
         var order = await _repository.GetById<Order>(id);
         if (order == null)
             throw new EntityNotFoundException($"No se encontró un producto con el ID {id}");
 
-        if (string.IsNullOrWhiteSpace(request.OrderStatus))
-            throw new ArgumentException("El estado del pedido no puede estar vacío.");
-
-        if(!Enum.TryParse<OrderStatus>(request.OrderStatus, true, out var newStatus))
-            throw new InvalidOperationException($"El estado '{request.OrderStatus}'no válido.");
+        if (!Enum.TryParse<OrderStatus>(newOrderStatus, true, out var newStatus))
+            throw new InvalidOperationException($"El estado '{newOrderStatus}' no válido.");
 
         order.Status = newStatus;
         await _repository.Update(order);
@@ -154,5 +154,15 @@ public class OrdersManagementService : IOrdersManagementService
             )).ToList(),
             order.Status.ToString()
         );
-    }*/
+    }
+
+    public async Task<OrderModel.OrderResponse> CreateOrder(OrderModel.OrderRequest request)
+    {
+        return await AddOrder(request);
+    }
+
+    public Task<OrderModel.OrderResponse> UpdateOrderStatus(Guid id, OrderModel.OrderRequest request)
+    {
+        throw new NotImplementedException();
+    }
 }
