@@ -62,12 +62,13 @@ public class OrdersController : ControllerBase
         }
     }
 
-    [HttpGet]//8
+    [HttpGet("{id}")]//8
     public async Task<IActionResult> GetOrderById(Guid id)
     {
         try
         {
-            var order = await _service.GetOrderById(id);
+            // Especifica el tipo de retorno para evitar ambigüedad
+            var order = await _service.GetOrderById(id); // Elimina el cast innecesario
             return Ok(order);
         }
         catch (EntityNotFoundException enfe)
