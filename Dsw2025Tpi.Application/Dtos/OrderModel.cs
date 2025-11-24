@@ -19,6 +19,7 @@ public record OrderModel
     public record OrderResponse(
         Guid Id,
         Guid CustomerId,
+        string CustomerName,
         string ShippingAddress,
         string BillingAddress,
         string Notes,

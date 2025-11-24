@@ -64,6 +64,7 @@ public class OrdersManagementService : IOrdersManagementService
         var response = new OrderModel.OrderResponse(
             order.Id,
             order.CustomerId,
+            order.Customer.Name,
             order.ShippingAddress,
             order.BillingAddress,
             order.Notes,
@@ -89,6 +90,7 @@ public class OrdersManagementService : IOrdersManagementService
         return new OrderModel.OrderResponse(
             order.Id,
             order.CustomerId,
+            order.Customer.Name,
             order.ShippingAddress,
             order.BillingAddress,
             order.Notes,
@@ -105,13 +107,14 @@ public class OrdersManagementService : IOrdersManagementService
 
     public async Task<List<OrderModel.OrderResponse>?> GetOrders()
     {
-        var orders = await _repository.GetAll<Order>(include: new[] { "OrderItems", "OrderItems.Product" });
+        var orders = await _repository.GetAll<Order>(include: new[] { "OrderItems", "OrderItems.Product", "Customer" });
         if (orders == null || !orders.Any())
             throw new EntityNotFoundException("No se encontraron órdenes.");
 
         return orders.Select(o => new OrderModel.OrderResponse(
         o.Id,
         o.CustomerId,
+        o.Customer.Name,
         o.ShippingAddress,
         o.BillingAddress,
         o.Notes,
@@ -142,6 +145,7 @@ public class OrdersManagementService : IOrdersManagementService
         return new OrderModel.OrderResponse(
             order.Id,
             order.CustomerId,
+            order.Customer.Name,
             order.ShippingAddress,
             order.BillingAddress,
             order.Notes,
