@@ -60,3 +60,44 @@ public class OrdersController : ControllerBase
         }
     }
 }
+
+    [HttpGet("{id}")]//8
+    public async Task<IActionResult> GetOrderById(Guid id)
+    {
+        try
+        {
+            var order = await _service.GetOrderById(id);
+            return Ok(order);
+        }
+        catch (EntityNotFoundException enfe)
+        {
+            return NotFound(enfe.Message);
+        }
+        catch (Exception ex)
+        {
+            return Problem(ex.Message);
+        }
+    }
+
+    //[HttpPut("{id}/status")]//9
+    //public async Task<IActionResult> UpdateOrderStatus(Guid id, [FromBody] OrderModel.OrderRequest request)
+    //{
+    //    try
+    //    {
+    //        var order = await _service.UpdateOrderStatus(id, request);
+    //        return Ok(order);
+    //    }
+    //    catch (EntityNotFoundException enfe)
+    //    {
+    //        return NotFound(enfe.Message);
+    //    }
+    //    catch (ArgumentException ae)
+    //    {
+    //        return BadRequest(ae.Message);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return Problem(ex.Message);
+    //    }
+    //}
+}

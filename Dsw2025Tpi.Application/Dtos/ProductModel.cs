@@ -24,4 +24,12 @@ public record ProductModel
         decimal CurrentUnitPrice,
         int StockQuantity,
         bool IsActive);
+    public record ResponsePagination(
+        List<ProductResponse> ProductItems, 
+        int Total);
+    public record FilterProduct(
+        string? Status,
+        string? Search,
+        int? PageNumber,
+        int? PageSize);
 }

@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Dsw2025Tpi.Data.Migrations
+namespace Dsw2025Tpi.Data.Migrations.Dsw2025Tpi
 {
     [DbContext(typeof(Dsw2025TpiContext))]
-    [Migration("20250628004727_Initial_Model")]
-    partial class Initial_Model
+    [Migration("20251123234318_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

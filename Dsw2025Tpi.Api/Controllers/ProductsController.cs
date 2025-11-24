@@ -76,6 +76,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] ProductModel.ProductRequest request)
     {
         try
@@ -102,6 +103,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPatch("{id}")]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> ToggleProductStatus(Guid id)
     {
         try

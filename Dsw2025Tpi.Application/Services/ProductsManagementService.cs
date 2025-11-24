@@ -68,12 +68,28 @@ public class ProductsManagementService : IProductsManagementService
             : null;
     }
 
-    public async Task<IEnumerable<ProductModel.ProductResponse>?> GetProducts()
+    public async Task<ProductModel.ResponsePagination?> GetProducts(ProductModel.FilterProduct? request = null)
     {
         var products = await _repository.GetFiltered<Product>(p => p.IsActive);
-        if(products == null || !products.Any()) 
+        if (products == null || !products.Any())
             throw new EntityNotFoundException("No hay productos cargados");
-        return products?.Select(MapToResponse);
+
+        var productsFiltered = products
+            .Select(p => new ProductModel.ProductResponse(
+                p.Id,
+                p.Sku,
+                p.InternalCode,
+                p.Name,
+                p.Description,
+                p.CurrentUnitPrice,
+                p.StockQuantity,
+                p.IsActive))
+            .OrderBy(p => p.Sku)
+            .Skip(((request?.PageNumber ?? 1) - 1) * (request?.PageSize ?? products.Count()))
+            .Take(request?.PageSize ?? products.Count())
+            .ToList();
+
+        return new ProductModel.ResponsePagination(productsFiltered, products.Count());
     }
 
     public async Task<ProductModel.ProductResponse> AddProduct(ProductModel.ProductRequest request)
