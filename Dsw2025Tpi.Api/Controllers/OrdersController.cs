@@ -8,7 +8,7 @@ namespace Dsw2025Ej15.Api.Controllers;
 
 [ApiController]
 [Route("api/orders/")]
-[Authorize(Roles = "admin")]
+[Authorize]
 public class OrdersController : ControllerBase
 {
     private readonly IOrdersManagementService _service;
@@ -17,7 +17,7 @@ public class OrdersController : ControllerBase
         _service = service;
     }
 
-    [HttpGet()]
+    [HttpGet]//Endpoint 7
     public async Task<IActionResult> GetAllOrders()
     {
         try
@@ -33,10 +33,10 @@ public class OrdersController : ControllerBase
         {
             return Problem(ex.Message);
         }
-        
+
     }
 
-    [HttpPost]
+    [HttpPost]//Endpoint 6
     public async Task<IActionResult> CreateOrder([FromBody] OrderModel.OrderRequest request)
     {
         try
@@ -62,13 +62,13 @@ public class OrdersController : ControllerBase
         }
     }
 
-    [HttpGet("{id}")]//8
+    [HttpGet]//8
     public async Task<IActionResult> GetOrderById(Guid id)
     {
         try
         {
-            await _service.GetOrderById(id); // El método devuelve void, así que no se puede asignar a una variable.
-            return Ok(); // Puedes devolver Ok() si la operación fue exitosa, o modificar según la lógica deseada.
+            var order = await _service.GetOrderById(id);
+            return Ok(order);
         }
         catch (EntityNotFoundException enfe)
         {
