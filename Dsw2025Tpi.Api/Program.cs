@@ -112,14 +112,24 @@ public class Program
         {
             app.UseSwagger();
             app.UseSwaggerUI();
+            
         }
 
         app.UseHttpsRedirection();
         app.UseMiddleware<ExceptionHandler>();
 
         // app.UseCors("PermitirFrontend");
+        app.UseCors(options =>
+        {
+            options.WithOrigins("https://localhost:5173")
+                   .AllowAnyMethod()
+                   .AllowAnyHeader()
+                   .AllowCredentials();
+        });
         app.UseAuthentication();
         app.UseAuthorization();
+
+        
 
         app.MapControllers();
         

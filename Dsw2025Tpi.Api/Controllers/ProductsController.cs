@@ -56,4 +56,18 @@ public class ProductsController : ControllerBase
         var updatedProduct = await _service.ToggleStatus(id);
         return Ok(updatedProduct);
     }
+
+    [HttpGet("admin")]
+    [Authorize(Roles = "admin")]
+    public async Task<IActionResult> GetAllProductsAdmin([FromQuery] ProductModel.FilterProduct request)
+    {
+        var products = await _service.GetProducts(request);
+        if (products == null)
+        {
+            Response.Headers.Append("X-Message", "There are no active products");
+            return NoContent();
+        }
+        return Ok(products);
+    }
+
 }
