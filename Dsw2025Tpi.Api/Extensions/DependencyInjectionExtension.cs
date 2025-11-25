@@ -13,6 +13,8 @@ public static class DependencyInjectionExtension
         services.AddTransient<IProductsManagementService, ProductsManagementService>();
         services.AddTransient<IOrdersManagementService, OrdersManagementService>();
         services.AddScoped<IRepository, EfRepository>();
+        services.AddScoped<JwtTokenServices>();
+        services.AddScoped<IAuthenticationService, AuthenticationService>();
         return services;
     }
 }

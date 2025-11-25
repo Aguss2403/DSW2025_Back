@@ -14,7 +14,7 @@ public static class DomainServicesConfigurationExtension
             options.UseSqlServer(configuration.GetConnectionString("Dsw2025TpiEntities"));
             options.UseSeeding((c, t) =>
             {
-                ((Dsw2025TpiContext)c).SeedWork<Customer>("Sources\\customers.json");
+                //((Dsw2025TpiContext)c).SeedWork<Customer>("Sources\\customers.json");
             });
         });
         return services;

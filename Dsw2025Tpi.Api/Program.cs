@@ -1,5 +1,10 @@
+using Dsw2025Tpi.Api.Utils;
+using Dsw2025Tpi.Application.Interfaces; // <-- Agregado
+using Dsw2025Tpi.Application.Services;   // <-- Agregado
 using Dsw2025Tpi.Data;
-using Dsw2025Tpi.Domain.Entities; // Asegúrate de tener este using
+using Dsw2025Tpi.Data.Repositories;
+using Dsw2025Tpi.Domain.Entities;
+using Dsw2025Tpi.Domain.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -14,8 +19,7 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // 1. Configurar el Contexto de Base de Datos (CORREGIDO)
-        // Usamos Dsw2025TpiContext, no AuthenticateContext
+        // 1. Configurar el Contexto de Base de Datos
         builder.Services.AddDbContext<Dsw2025TpiContext>(options =>
         {
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
@@ -25,7 +29,7 @@ public class Program
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
 
-        // Configuración de Swagger con soporte para JWT
+        // Configuración de Swagger
         builder.Services.AddSwaggerGen(o =>
         {
             o.SwaggerDoc("v1", new OpenApiInfo
@@ -61,7 +65,7 @@ public class Program
 
         builder.Services.AddHealthChecks();
 
-        // 2. Configuración de JWT (Sin AddIdentity porque usas entidades custom)
+        // 2. Configuración de JWT
         var jwtConfig = builder.Configuration.GetSection("Jwt");
         var keyText = jwtConfig["Key"] ?? throw new ArgumentException("Falta la configuración Jwt:Key en appsettings");
         var key = Encoding.UTF8.GetBytes(keyText);
@@ -73,7 +77,7 @@ public class Program
         })
         .AddJwtBearer(options =>
         {
-            options.RequireHttpsMetadata = false; // Solo para desarrollo
+            options.RequireHttpsMetadata = false;
             options.SaveToken = true;
             options.TokenValidationParameters = new TokenValidationParameters
             {
@@ -87,8 +91,12 @@ public class Program
             };
         });
 
-        // Inyección de dependencias (Asegúrate de tener estas clases o comenta si no existen aún)
-        // builder.Services.AddScoped<IAuthenticationService, AuthenticationService>(); 
+        builder.Services.AddTransient<IProductsManagementService, ProductsManagementService>();
+        builder.Services.AddTransient<IOrdersManagementService, OrdersManagementService>();
+        builder.Services.AddScoped<IRepository, EfRepository>();
+        builder.Services.AddScoped<JwtTokenServices>();
+        builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+        builder.Services.AddDomainServices(builder.Configuration);
 
         var app = builder.Build();
 
@@ -101,22 +109,35 @@ public class Program
 
         app.UseHttpsRedirection();
 
-        // Middleware de manejo de errores global (si lo tienes creado)
-        // app.UseMiddleware<ExceptionHandler>();
-
         app.UseCors(options =>
         {
-            options.WithOrigins("http://localhost:5173", "https://localhost:5173") // Agregué http por las dudas
+            options.WithOrigins("http://localhost:5173", "https://localhost:5173")
                    .AllowAnyMethod()
                    .AllowAnyHeader()
                    .AllowCredentials();
         });
 
-        app.UseAuthentication(); // Importante: Auth antes de Authorization
+        app.UseAuthentication();
         app.UseAuthorization();
 
         app.MapControllers();
         app.MapHealthChecks("/healthcheck");
+
+        // Ejecución del Seeder (Creación de roles automática)
+        using (var scope = app.Services.CreateScope())
+        {
+            var services = scope.ServiceProvider;
+            try
+            {
+                var context = services.GetRequiredService<Dsw2025TpiContext>();
+                DataSeeder.Seed(context);
+            }
+            catch (Exception ex)
+            {
+                var logger = services.GetRequiredService<ILogger<Program>>();
+                logger.LogError(ex, "Ocurrió un error al insertar datos iniciales (Seeding).");
+            }
+        }
 
         app.Run();
     }

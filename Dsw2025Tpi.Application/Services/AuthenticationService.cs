@@ -1,77 +1,78 @@
 ﻿using Dsw2025Tpi.Application.Dtos;
-using Dsw2025Tpi.Application.Exceptions;
+using Dsw2025Tpi.Application.Exceptions; // Asegúrate de que esta carpeta exista o usa System.Exception
 using Dsw2025Tpi.Application.Interfaces;
-using Microsoft.AspNetCore.Identity;
+using Dsw2025Tpi.Data;
+using Dsw2025Tpi.Domain.Entities; // Tus entidades personalizadas
+using Microsoft.EntityFrameworkCore;
 using System.Security.Authentication;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore; // <-- Nueva línea
 
+namespace Dsw2025Tpi.Application.Services;
 
-namespace Dsw2025Tpi.Application.Services
+public class AuthenticationService : IAuthenticationService
 {
-    public class AuthenticationService : IAuthenticationService
+    private readonly Dsw2025TpiContext _context;
+    private readonly JwtTokenServices _jwtTokenServices;
+
+    public AuthenticationService(Dsw2025TpiContext context, JwtTokenServices jwtTokenServices)
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly JwtTokenServices _jwtTokenServices;
+        _context = context;
+        _jwtTokenServices = jwtTokenServices;
+    }
 
-        public AuthenticationService(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
-            JwtTokenServices jwtTokenServices)
+    public async Task<string> Login(LoginModel request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Username) || string.IsNullOrWhiteSpace(request.Password))
+            throw new ArgumentException("El usuario y la contraseña son obligatorios.");
+
+        // 1. Buscamos el usuario en TU base de datos, incluyendo su Rol
+        var user = await _context.Users
+            .Include(u => u.Role)
+            .FirstOrDefaultAsync(u => u.Username == request.Username);
+
+        // 2. Verificamos si existe y si la contraseña coincide
+        // NOTA: En producción, aquí deberías comparar hashes (ej: BCrypt.Verify), no texto plano.
+        if (user == null || user.Password != request.Password)
+            throw new InvalidCredentialException("Usuario o contraseña inválidos.");
+
+        // 3. Generamos el token usando el nombre del Rol de tu entidad
+        return _jwtTokenServices.GenerateToken(user.Username, user.Role.Name);
+    }
+
+    public async Task<string> Register(RegisterModel model)
+    {
+        // 1. Validaciones básicas
+        if (model == null) throw new ArgumentException("Los datos de registro son obligatorios.");
+
+        // Puedes agregar más validaciones aquí o usar DataAnnotations en el DTO
+        if (!model.Email.Contains("@")) throw new ArgumentException("Formato de email inválido.");
+
+        // 2. Verificar si el usuario ya existe (por Email o Username)
+        bool userExists = await _context.Users.AnyAsync(u => u.Username == model.Username || u.Email == model.Email);
+        if (userExists)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _jwtTokenServices = jwtTokenServices;
+            throw new InvalidOperationException("El nombre de usuario o email ya está en uso.");
         }
 
-        public async Task<string> Login(LoginModel request)
+        // 3. Obtener el Rol "User" de la base de datos
+        // (Asegúrate de haber corrido el Seeder que hicimos antes)
+        var userRole = await _context.Roles.FirstOrDefaultAsync(r => r.Name == "User");
+        if (userRole == null)
         {
-            if (string.IsNullOrWhiteSpace(request.Username) || string.IsNullOrWhiteSpace(request.Password))
-                throw new ArgumentException("Username and password are required.");
-
-            var user = await _userManager.FindByNameAsync(request.Username);
-            if (user == null)
-                throw new InvalidCredentialException("Invalid username or password.");
-
-            var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
-            if (!result.Succeeded)
-                throw new InvalidCredentialsException("Invalid username or password.");
-
-            var roles = await _userManager.GetRolesAsync(user);
-            var role = roles.FirstOrDefault() ?? "User";
-
-            return _jwtTokenServices.GenerateToken(request.Username, role);
+            throw new InvalidOperationException("Error interno: El rol 'User' no está configurado.");
         }
 
-        public async Task<string> Register(RegisterModel model)
-        {
-            if (model == null) throw new ArgumentException("Register model cannot be null.");
+        // 4. Crear la Entidad USER (Cuenta)
+        // NOTA: Aquí deberías hashear la contraseña antes de pasarla al constructor.
+        var newUser = new User(model.Username, model.Email, model.Password, userRole);
 
-            if (string.IsNullOrWhiteSpace(model.Username) ||
-                string.IsNullOrWhiteSpace(model.Password) ||
-                string.IsNullOrWhiteSpace(model.Email))
-                throw new ArgumentException("All fields are required.");
+        // 5. Crear la Entidad CUSTOMER (Perfil) vinculada al usuario
+        var newCustomer = new Customer(newUser, model.FirstName, model.LastName, model.Address, model.PhoneNumber);
 
-            if (!model.Email.Contains("@"))
-                throw new ArgumentException("Invalid email format.");
+        // 6. Guardar en la base de datos
+        // Al agregar Customer, EF Core entiende que debe guardar también el User vinculado
+        _context.Customers.Add(newCustomer);
+        await _context.SaveChangesAsync();
 
-            var user = new IdentityUser
-            {
-                UserName = model.Username,
-                Email = model.Email
-            };
-
-            var result = await _userManager.CreateAsync(user, model.Password);
-
-            if (!result.Succeeded)
-            {
-                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                throw new Dsw2025Tpi.Application.Exceptions.ApplicationException($"Registration failed: {errors}"); // Usa tu propia ApplicationException
-            }
-
-            await _userManager.AddToRoleAsync(user, "User");
-
-            return "User registered successfully.";
-        }
+        return "Usuario y Cliente registrados exitosamente.";
     }
 }
