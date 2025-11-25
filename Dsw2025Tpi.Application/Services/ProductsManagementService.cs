@@ -68,7 +68,7 @@ public class ProductsManagementService : IProductsManagementService
             : null;
     }
 
-    public async Task<ProductModel.ResponsePagination?> GetProducts(ProductModel.FilterProduct request)
+    public async Task<ProductModel.ResponsePagination?> GetProducts(ProductModel.FilterProduct? request=null)
     {
         var isActive = request.Status == "enabled" ? (bool?) true :
                        request.Status == "disabled" ? (bool?) false : null;

@@ -8,14 +8,21 @@ namespace Dsw2025Tpi.Domain.Entities;
 
 public class Customer : EntityBase
 {
-    public string Name { get; set; }
-    public string Email { get; set; }
-    public string PhoneNumber { get; set; }
-
-    public Customer(string name, string email, string phoneNumber)
+    public Customer() { }
+    public Customer(User user, string firstName, string lastName, string address, string number)
     {
-        Name = name;
-        Email = email;
-        PhoneNumber = phoneNumber;
+        User = user;
+        UserId = user.Id;
+        FirstName = firstName;
+        LastName = lastName;
+        Address = address;
+        PhoneNumber = number;
     }
+
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
+    public string Address { get; set; } = string.Empty;
+    public string PhoneNumber { get; set; }
+    public Guid UserId { get; set; }
+    public User? User { get; set; }
 }

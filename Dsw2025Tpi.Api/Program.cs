@@ -1,11 +1,6 @@
-using Dsw2025Tpi.Api.Data;
-using Dsw2025Tpi.Api.Middlewares;
-using Dsw2025Tpi.Api.Utils;
-using Dsw2025Tpi.Application.Interfaces;
-using Dsw2025Tpi.Application.Services;
 using Dsw2025Tpi.Data;
+using Dsw2025Tpi.Domain.Entities; // Asegúrate de tener este using
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -15,15 +10,22 @@ namespace Dsw2025Tpi.Api;
 
 public class Program
 {
-    public static async Task Main(string[] args)
+    public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Add services to the container.
+        // 1. Configurar el Contexto de Base de Datos (CORREGIDO)
+        // Usamos Dsw2025TpiContext, no AuthenticateContext
+        builder.Services.AddDbContext<Dsw2025TpiContext>(options =>
+        {
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+        });
 
+        // Add services to the container.
         builder.Services.AddControllers();
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
+
+        // Configuración de Swagger con soporte para JWT
         builder.Services.AddSwaggerGen(o =>
         {
             o.SwaggerDoc("v1", new OpenApiInfo
@@ -36,8 +38,9 @@ public class Program
             {
                 In = ParameterLocation.Header,
                 Name = "Authorization",
-                Description = "Ingresar el token",
+                Description = "Ingresar el token con el formato: Bearer {token}",
                 Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer"
             });
 
             o.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -58,52 +61,34 @@ public class Program
 
         builder.Services.AddHealthChecks();
 
-        builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
-        {
-            options.Password = new PasswordOptions
-            {
-                RequireDigit = true,
-                RequiredLength = 8,
-                RequireLowercase = true,
-                RequireNonAlphanumeric = true,
-                RequireUppercase = true,
-            };
-        })
-        .AddEntityFrameworkStores<AuthenticateContext>()
-        .AddDefaultTokenProviders();
-
+        // 2. Configuración de JWT (Sin AddIdentity porque usas entidades custom)
         var jwtConfig = builder.Configuration.GetSection("Jwt");
-        var keyText = jwtConfig["Key"] ?? throw new ArgumentException("Jwt key");
-        var key= Encoding.UTF8.GetBytes(keyText);
+        var keyText = jwtConfig["Key"] ?? throw new ArgumentException("Falta la configuración Jwt:Key en appsettings");
+        var key = Encoding.UTF8.GetBytes(keyText);
+
         builder.Services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         })
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = jwtConfig["Issuer"],
-                    ValidAudience = jwtConfig["Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(key)
-                };
-            });
-
-        builder.Services.AddDomainServices(builder.Configuration);
-        builder.Services.AddSingleton<JwtTokenServices>();
-        builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-
-        builder.Services.AddDbContext<AuthenticateContext>(options =>
+        .AddJwtBearer(options =>
         {
-            options.UseSqlServer(builder.Configuration.GetConnectionString("Dsw2025TpiEntities"));
+            options.RequireHttpsMetadata = false; // Solo para desarrollo
+            options.SaveToken = true;
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtConfig["Issuer"],
+                ValidAudience = jwtConfig["Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(key)
+            };
         });
 
-        builder.Services.AddDependencyInjection();
+        // Inyección de dependencias (Asegúrate de tener estas clases o comenta si no existen aún)
+        // builder.Services.AddScoped<IAuthenticationService, AuthenticationService>(); 
 
         var app = builder.Build();
 
@@ -112,35 +97,27 @@ public class Program
         {
             app.UseSwagger();
             app.UseSwaggerUI();
-            
         }
 
         app.UseHttpsRedirection();
-        app.UseMiddleware<ExceptionHandler>();
 
-        // app.UseCors("PermitirFrontend");
+        // Middleware de manejo de errores global (si lo tienes creado)
+        // app.UseMiddleware<ExceptionHandler>();
+
         app.UseCors(options =>
         {
-            options.WithOrigins("https://localhost:5173")
+            options.WithOrigins("http://localhost:5173", "https://localhost:5173") // Agregué http por las dudas
                    .AllowAnyMethod()
                    .AllowAnyHeader()
                    .AllowCredentials();
         });
-        app.UseAuthentication();
+
+        app.UseAuthentication(); // Importante: Auth antes de Authorization
         app.UseAuthorization();
 
-        
-
         app.MapControllers();
-        
         app.MapHealthChecks("/healthcheck");
-        using (var scope = app.Services.CreateScope())
-        {
-            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            await RoleSeeder.SeedRolesAsync(roleManager);
-        }
 
         app.Run();
     }
 }
-

@@ -19,7 +19,8 @@ public record OrderModel
     public record OrderResponse(
         Guid Id,
         Guid CustomerId,
-        string CustomerName,
+        string CustomerFirstName,
+        string CustomerLastName,
         string ShippingAddress,
         string BillingAddress,
         string Notes,

@@ -64,7 +64,8 @@ public class OrdersManagementService : IOrdersManagementService
         var response = new OrderModel.OrderResponse(
             order.Id,
             order.CustomerId,
-            order.Customer.Name,
+            order.Customer.FirstName,
+            order.Customer.LastName,
             order.ShippingAddress,
             order.BillingAddress,
             order.Notes,
@@ -90,7 +91,8 @@ public class OrdersManagementService : IOrdersManagementService
         return new OrderModel.OrderResponse(
             order.Id,
             order.CustomerId,
-            order.Customer.Name,
+            order.Customer.FirstName,
+            order.Customer.LastName,
             order.ShippingAddress,
             order.BillingAddress,
             order.Notes,
@@ -114,7 +116,8 @@ public class OrdersManagementService : IOrdersManagementService
         return orders.Select(o => new OrderModel.OrderResponse(
         o.Id,
         o.CustomerId,
-        o.Customer.Name,
+        o.Customer.FirstName,
+        o.Customer.LastName,
         o.ShippingAddress,
         o.BillingAddress,
         o.Notes,
@@ -145,7 +148,8 @@ public class OrdersManagementService : IOrdersManagementService
         return new OrderModel.OrderResponse(
             order.Id,
             order.CustomerId,
-            order.Customer.Name,
+            order.Customer.FirstName, 
+            order.Customer.LastName,
             order.ShippingAddress,
             order.BillingAddress,
             order.Notes,

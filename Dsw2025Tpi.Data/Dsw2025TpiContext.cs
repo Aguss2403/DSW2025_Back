@@ -11,16 +11,48 @@ public class Dsw2025TpiContext : DbContext
         
     }
 
+    //public DbSet<Role> Roles { get; set; }
+    //public DbSet<User> Users { get; set; }
+    //public DbSet<Customer> Customers { get; set; }
+    //public DbSet<Product> Products { get; set; }
+    //public DbSet<Order> Orders { get; set; }
+    //public DbSet<OrderItem> OrderItems { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<Role>(eb =>
+        {
+            eb.ToTable("Roles");
+            eb.HasKey(r => r.Id);
+            eb.Property(r => r.Name).HasMaxLength(50).IsRequired();
+            eb.HasIndex(r => r.Name).IsUnique();
+        });
+        modelBuilder.Entity<User>(eb =>
+        {
+            eb.ToTable("Users");
+            eb.HasKey(u => u.Id);
+            eb.Property(u => u.Username).HasMaxLength(50).IsRequired();
+            eb.Property(u => u.Email).HasMaxLength(100).IsRequired();
+            eb.Property(u => u.Password).HasMaxLength(100).IsRequired();
+            eb.HasIndex(u => u.Username).IsUnique();
+            eb.HasOne(u => u.Role)
+              .WithMany(r => r.Users)
+              .HasForeignKey(u => u.RoleId)
+              .OnDelete(DeleteBehavior.Restrict);
+            eb.HasOne(u => u.Customer)
+              .WithOne(c => c.User)
+              .HasForeignKey<Customer>(c => c.UserId)
+              .OnDelete(DeleteBehavior.Cascade);
+        });
         modelBuilder.Entity<Customer>(eb =>
         {
             eb.ToTable("Customers");
             eb.HasKey(c => c.Id);
-            eb.Property(c => c.Name).HasMaxLength(50).IsRequired();
-            eb.Property(c => c.Email).HasMaxLength(100).IsRequired();
+            eb.Property(c => c.FirstName).HasMaxLength(50).IsRequired();
+            eb.Property(c => c.LastName).HasMaxLength(50).IsRequired();
             eb.Property(c => c.PhoneNumber).HasMaxLength(15).IsRequired();
+            eb.Property(c => c.Address).HasMaxLength(150).IsRequired();
         });
         modelBuilder.Entity<Product>(eb =>
         {

@@ -16,6 +16,10 @@ public class Product : EntityBase
     public int StockQuantity { get; set; }
     public bool IsActive { get; set; }
 
+    public Product()
+    {
+        
+    }
     public Product(string sku, string internalCode, string name, string description, decimal currentUnitPrice, int stockQuantity)
     {
         Sku = sku;
