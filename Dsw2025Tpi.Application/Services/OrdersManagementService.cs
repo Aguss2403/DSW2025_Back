@@ -52,8 +52,8 @@ public class OrdersManagementService : IOrdersManagementService
         }
 
         var order = new Order(
-            request.ShippingAddress,
-            request.BillingAddress,
+            customer.Address,
+            customer.Address,
             request.Notes,
             orderItems,
             request.CustomerId
@@ -66,8 +66,8 @@ public class OrdersManagementService : IOrdersManagementService
             order.CustomerId,
             order.Customer.FirstName,
             order.Customer.LastName,
-            order.ShippingAddress,
-            order.BillingAddress,
+            order.Customer.Address,
+            order.Customer.Address,
             order.Notes,
             orderItems.Select(oi => new OrderModel.OrderItemResponse(
                 oi.ProductId,

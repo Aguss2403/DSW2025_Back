@@ -11,8 +11,6 @@ public record OrderModel
 {
     public record OrderRequest(
         Guid CustomerId,
-        string ShippingAddress,
-        string BillingAddress,
         string Notes,
         List<OrderItemRequest> OrderItems
         );

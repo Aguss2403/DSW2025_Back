@@ -1,33 +1,54 @@
 ﻿using Dsw2025Tpi.Application.Dtos;
 using Dsw2025Tpi.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Authentication;
 
 namespace Dsw2025Tpi.Api.Controllers;
 
+[Route("api/[controller]")]
 [ApiController]
-[Route("api/auth")]
-public class AuthenticateController : ControllerBase
+public class AuthController : ControllerBase
 {
-    private readonly IAuthenticationService _authService;
+    private readonly IAuthenticationService _authenticationService;
 
-    public AuthenticateController(IAuthenticationService authService)
+    public AuthController(IAuthenticationService authenticationService)
     {
-        _authService = authService;
+        _authenticationService = authenticationService;
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginModel request)
+    public async Task<IActionResult> Login([FromBody] RequestLoginModel request)
     {
-        var token = await _authService.Login(request);
-
-        return Ok(new { token });
+        try
+        {
+            var response = await _authenticationService.Login(request);
+            return Ok(response);
+        }
+        catch (InvalidCredentialException ex)
+        {
+            return Unauthorized(ex.Message);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterModel model)
+    public async Task<IActionResult> Register([FromBody] RegisterModel request)
     {
-        var message = await _authService.Register(model);
-
-        return Ok(new { message });
+        try
+        {
+            var message = await _authenticationService.Register(request);
+            return Ok(new { message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 }

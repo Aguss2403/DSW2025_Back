@@ -19,60 +19,84 @@ public class AuthenticationService : IAuthenticationService
         _jwtTokenServices = jwtTokenServices;
     }
 
-    public async Task<string> Login(LoginModel request)
+    public async Task<ResponseLoginModel> Login(RequestLoginModel request)
     {
         if (string.IsNullOrWhiteSpace(request.Username) || string.IsNullOrWhiteSpace(request.Password))
             throw new ArgumentException("El usuario y la contraseña son obligatorios.");
 
-        // 1. Buscamos el usuario en TU base de datos, incluyendo su Rol
         var user = await _context.Users
             .Include(u => u.Role)
+            .Include(u => u.Customer)
             .FirstOrDefaultAsync(u => u.Username == request.Username);
 
-        // 2. Verificamos si existe y si la contraseña coincide
-        // NOTA: En producción, aquí deberías comparar hashes (ej: BCrypt.Verify), no texto plano.
         if (user == null || user.Password != request.Password)
             throw new InvalidCredentialException("Usuario o contraseña inválidos.");
 
-        // 3. Generamos el token usando el nombre del Rol de tu entidad
-        return _jwtTokenServices.GenerateToken(user.Username, user.Role.Name);
+        var token = _jwtTokenServices.GenerateToken(user.Username, user.Role.Name);
+
+        // 2. CORRECCIÓN: Usar el constructor del record (paréntesis, no llaves)
+        // Mapeamos los datos directamente al orden que definiste en el DTO ResponseLoginModel
+        return new ResponseLoginModel(
+            token,                                  // Token
+            user.Id,                                // Id
+            user.Username,                          // Username
+            user.Email,                             // Email
+            user.Role.Name,                         // Role
+            user.Customer?.Id ?? Guid.Empty,        // CustomerId (Si es null, enviamos Guid vacío)
+            user.Customer?.FirstName ?? "",         // FirstName
+            user.Customer?.LastName ?? "",          // LastName
+            user.Customer?.Address ?? "",           // Address
+            user.Customer?.PhoneNumber ?? ""        // PhoneNumber
+        );
     }
 
     public async Task<string> Register(RegisterModel model)
     {
         // 1. Validaciones básicas
         if (model == null) throw new ArgumentException("Los datos de registro son obligatorios.");
-
-        // Puedes agregar más validaciones aquí o usar DataAnnotations en el DTO
         if (!model.Email.Contains("@")) throw new ArgumentException("Formato de email inválido.");
 
-        // 2. Verificar si el usuario ya existe (por Email o Username)
+        // 2. Verificar si el usuario ya existe
         bool userExists = await _context.Users.AnyAsync(u => u.Username == model.Username || u.Email == model.Email);
         if (userExists)
         {
             throw new InvalidOperationException("El nombre de usuario o email ya está en uso.");
         }
 
-        // 3. Obtener el Rol "User" de la base de datos
-        // (Asegúrate de haber corrido el Seeder que hicimos antes)
-        var userRole = await _context.Roles.FirstOrDefaultAsync(r => r.Name == "User");
-        if (userRole == null)
+        // 3. Obtener el Rol por defecto (ej. "Client")
+        // IMPORTANTE: Asegúrate de que este rol exista en tu tabla Roles
+        var clientRole = await _context.Roles.FirstOrDefaultAsync(r => r.Name == "user");
+        if (clientRole == null)
         {
-            throw new InvalidOperationException("Error interno: El rol 'User' no está configurado.");
+            throw new InvalidOperationException("El rol 'Client' no existe en la base de datos.");
         }
 
-        // 4. Crear la Entidad USER (Cuenta)
-        // NOTA: Aquí deberías hashear la contraseña antes de pasarla al constructor.
-        var newUser = new User(model.Username, model.Email, model.Password, userRole);
+        // 4. Crear las entidades (User y Customer)
+        // Entity Framework es lo suficientemente inteligente para insertar ambos si están vinculados
+        var newUser = new User
+        {
+            Id = Guid.NewGuid(), // Opcional si tu DB lo genera solo, pero seguro ponerlo.
+            Username = model.Username,
+            Password = model.Password, // Nota: En producción, aquí deberías hashear la contraseña
+            Email = model.Email,
+            RoleId = clientRole.Id, // Asignamos la FK del rol
 
-        // 5. Crear la Entidad CUSTOMER (Perfil) vinculada al usuario
-        var newCustomer = new Customer(newUser, model.FirstName, model.LastName, model.Address, model.PhoneNumber);
+            // Creamos el Customer y lo asignamos a la propiedad de navegación
+            Customer = new Customer
+            {
+                Id = Guid.NewGuid(),
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Address = model.Address,
+                PhoneNumber = model.PhoneNumber
+            }
+        };
 
-        // 6. Guardar en la base de datos
-        // Al agregar Customer, EF Core entiende que debe guardar también el User vinculado
-        _context.Customers.Add(newCustomer);
+        // 5. Guardar en base de datos
+        _context.Users.Add(newUser);
         await _context.SaveChangesAsync();
 
-        return "Usuario y Cliente registrados exitosamente.";
+        // 6. Retornar mensaje de éxito (Aquí solucionas el error del return)
+        return $"Usuario {model.Username} registrado exitosamente.";
     }
 }
