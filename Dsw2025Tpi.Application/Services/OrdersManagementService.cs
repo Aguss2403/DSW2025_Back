@@ -84,7 +84,7 @@ public class OrdersManagementService : IOrdersManagementService
 
     public async Task<OrderModel.OrderResponse?> GetOrderById(Guid id)
     {
-        var order = await _repository.GetById<Order>(id);
+        var order = await _repository.GetById<Order>(id, include: new[] { "Customer", "OrderItems", "OrderItems.Product" });
         if (order == null)
             throw new EntityNotFoundException($"No se encontró la orden con ID {id}");
 
