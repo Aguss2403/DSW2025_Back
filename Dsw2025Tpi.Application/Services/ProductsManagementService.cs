@@ -74,7 +74,7 @@ public class ProductsManagementService : IProductsManagementService
                        request.Status == "disabled" ? (bool?) false : null;
         var activeProducts = await _repository.GetFiltered<Product>(p => (
             (isActive == null || p.IsActive == isActive)
-            &&string.IsNullOrEmpty(request.Search) || p.Name.Contains(request.Search))
+            (string.IsNullOrEmpty(request.Search) || p.Name.Contains(request.Search)))
             );
 
         if (activeProducts is null || !activeProducts.Any())
@@ -151,7 +151,7 @@ public class ProductsManagementService : IProductsManagementService
         if (product == null)
             throw new EntityNotFoundException($"No se encontró un producto con el ID {id}");
 
-        product.IsActive = false;
+        product.IsActive = !product.IsActive;
 
         var updatedProduct = await _repository.Update(product);
 
