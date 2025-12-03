@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Dsw2025Tpi.Application.Exceptions;
 
-namespace Dsw2025Tpi.Application.Exceptions
+public class InvalidFormatSKUException : ApplicationException
 {
-    public class InvalidFormatSKUException
+    public InvalidFormatSKUException()
+        : base("El formato del SKU es inválido. Debe ser 'SKU-XXXX'.", 3000)
     {
     }
 }

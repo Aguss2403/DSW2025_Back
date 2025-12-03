@@ -1,8 +1,8 @@
-﻿namespace Dsw2025Ej15.Application.Exceptions;
+﻿namespace Dsw2025Tpi.Application.Exceptions;
 
 public class EntityNotFoundException : ApplicationException
 {
-    public EntityNotFoundException(string message) : base(message)
+    public EntityNotFoundException(string message) : base(message, 1004)
     {
     }
 }

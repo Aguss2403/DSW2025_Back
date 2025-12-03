@@ -100,6 +100,8 @@ public class Program
 
         var app = builder.Build();
 
+        app.UseMiddleware<Dsw2025Tpi.Api.Middlewares.ExceptionHandler>();
+
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {

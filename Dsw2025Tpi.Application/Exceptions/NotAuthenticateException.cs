@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Dsw2025Tpi.Application.Exceptions;
 
-namespace Dsw2025Tpi.Application.Exceptions
+public class NotAuthenticateException : ApplicationException
 {
-    public class NotAuthenticateException
+    public NotAuthenticateException() : base("Usuario no autenticado", 4010)
     {
     }
 }

@@ -1,7 +1,8 @@
 ﻿using Dsw2025Tpi.Application.Exceptions;
 using System.Net;
-using System.Security.Authentication;
+using System.Security.Authentication; 
 using System.Text.Json;
+using ApplicationException = Dsw2025Tpi.Application.Exceptions.ApplicationException;
 
 namespace Dsw2025Tpi.Api.Middlewares
 {
@@ -24,7 +25,7 @@ namespace Dsw2025Tpi.Api.Middlewares
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Exception occurred: {ExceptionType}", e.GetType().Name);
+                _logger.LogError(e, "Ocurrió una excepción: {ExceptionType}", e.GetType().Name);
                 await HandleExceptionAsync(context, e);
             }
         }
@@ -35,27 +36,51 @@ namespace Dsw2025Tpi.Api.Middlewares
 
             var statusCode = e switch
             {
-                    Dsw2025Tpi.Application.Exceptions.ApplicationException _ => HttpStatusCode.BadRequest,
-                InvalidCredentialsException _ => HttpStatusCode.BadRequest,
-                InvalidCredentialException _ => HttpStatusCode.Unauthorized,
+                ValidationException => HttpStatusCode.BadRequest,
+                InvalidFormatSKUException => HttpStatusCode.BadRequest,
+                InvalidStatusException => HttpStatusCode.BadRequest,
+
+                DuplicatedEntityException => HttpStatusCode.Conflict,
+
+                InvalidCredentialsException => HttpStatusCode.Unauthorized,
+                NotAuthenticateException => HttpStatusCode.Unauthorized,
+
+                NotFoundException => HttpStatusCode.NotFound,
+                EntityNotFoundException => HttpStatusCode.NotFound,
+
+                NoContentException => HttpStatusCode.NoContent,
+
+                ApplicationException => HttpStatusCode.BadRequest,
+
+                KeyNotFoundException => HttpStatusCode.NotFound,
+                UnauthorizedAccessException => HttpStatusCode.Unauthorized,
+
                 _ => HttpStatusCode.InternalServerError
             };
 
             context.Response.StatusCode = (int)statusCode;
 
-            var message = e switch
+            if (statusCode == HttpStatusCode.NoContent)
             {
-                Dsw2025Tpi.Application.Exceptions.ApplicationException _ => e.Message,
-                InvalidCredentialsException _ => "Invalid username or password.",
-                InvalidCredentialException _ => "Unauthorized access.",
-                _ => "Internal server error."
-            };
+                return Task.CompletedTask;
+            }
+
+            int responseCode = 0;
+            string responseMessage = "Ha ocurrido un error interno en el servidor.";
+            string responseDetail = e.Message; 
+
+            if (e is ApplicationException appEx)
+            {
+                responseCode = appEx.Code;      
+                responseMessage = appEx.Message; 
+            }
 
             var response = new
             {
-                StatusCode = context.Response.StatusCode,
-                Message = message,
-                Detail = e.Message
+                statusCode = context.Response.StatusCode,
+                message = responseMessage, 
+                code = responseCode,       
+                detail = responseDetail    
             };
 
             var jsonResponse = JsonSerializer.Serialize(response);

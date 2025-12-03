@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Dsw2025Tpi.Application.Exceptions;
 
-namespace Dsw2025Tpi.Application.Exceptions
+public class NoContentException : ApplicationException
 {
-    public class NoContentException
+    public NoContentException(string message = "No hay contenido para mostrar.")
+        : base(message, 2004)
     {
     }
 }

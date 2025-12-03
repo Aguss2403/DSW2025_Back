@@ -29,8 +29,9 @@ public record ProductModel
         List<ProductResponse> Items, 
         int Total);
     public record FilterProduct(
-        string? Status,
-        string? Search,
-        int? PageNumber,
-        int? PageSize);
+         string? Status = null,
+         string? Search = null,
+         int? PageNumber = 1,
+         int? PageSize = 10
+     );
 }

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Dsw2025Tpi.Application.Exceptions;
 
-namespace Dsw2025Tpi.Application.Exceptions
+public class InvalidStatusException : ApplicationException
 {
-    public class InvalidStatusException
+    public InvalidStatusException(string message) : base(message, 4001)
     {
     }
 }

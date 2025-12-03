@@ -1,9 +1,13 @@
-﻿namespace Dsw2025Tpi.Application.Exceptions;
+﻿using System;
 
-public class ApplicationException : Exception
+namespace Dsw2025Tpi.Application.Exceptions;
+
+public abstract class ApplicationException : Exception
 {
-    public ApplicationException(string message): base(message)
+    public int Code { get; }
+
+    protected ApplicationException(string message, int code) : base(message)
     {
-        
+        Code = code;
     }
 }
