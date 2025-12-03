@@ -72,9 +72,9 @@ public class ProductsManagementService : IProductsManagementService
     {
         var isActive = request.Status == "enabled" ? (bool?) true :
                        request.Status == "disabled" ? (bool?) false : null;
-        var activeProducts = await _repository.GetFiltered<Product>(p => (
+        var activeProducts = await _repository.GetFiltered<Product>(p => 
             (isActive == null || p.IsActive == isActive)
-            (string.IsNullOrEmpty(request.Search) || p.Name.Contains(request.Search)))
+            &&(string.IsNullOrEmpty(request.Search) || p.Name.Contains(request.Search))
             );
 
         if (activeProducts is null || !activeProducts.Any())
